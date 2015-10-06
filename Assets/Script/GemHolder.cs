@@ -8,6 +8,7 @@ public class GemHolder : MonoBehaviour {
 	public int GridHeight = 5;
 	public GameObject gemPrefab;
 	public GameObject[] charPrefab;
+	public int hp = 10;
 	//public GameObject[] monsterPrefab;
 	//private bool[,] mark_to_create = new bool[10, 10];
 	public List<GameObject> characterList = new List<GameObject>();
@@ -108,14 +109,18 @@ public class GemHolder : MonoBehaviour {
 			CheckChar ();
 		}
 		else if(status == Status.CheckChar) {
+			CheckGameStatus();
 			status = Status.CheckBoard;
 			CheckBoard();
+
 		}
 		else if( status == Status.CheckBoard) {
 			status = Status.CheckMonster;
 			CheckMonster ();
+
 		}
 		else if( status == Status.CheckMonster) {
+			CheckGameStatus();
 			status = Status.NewTurn;
 			NewTurn ();
 		}
@@ -123,6 +128,44 @@ public class GemHolder : MonoBehaviour {
 			status = Status.Ready;
 			//Ready ();
 		}
+	}
+
+	void CheckGameStatus()
+	{
+		if(CheckWinning())
+		{
+			Winning();
+		}
+		if(CheckLosing())
+		{
+			Losing();
+		}
+	}
+
+	void Winning()
+	{
+		Debug.Log ("Winning");
+	}
+
+	void Losing()
+	{
+		Debug.Log ("Losing");
+	}
+
+	bool CheckWinning()
+	{
+		if(monsterList.Count == 0)
+			return true;
+		return false;
+	}
+
+	bool CheckLosing()
+	{
+		if(characterList.Count == 0)
+			return true;
+		if(hp == 0)
+			return true;
+		return false;
 	}
 
 	//Check if any character is up for action

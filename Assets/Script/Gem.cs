@@ -272,11 +272,12 @@ public class Gem : MonoBehaviour {
 
 	public void ApplyDamage(int damage)
 	{
-		Debug.Log ("ApplyDamage");
+		//Debug.Log ("ApplyDamage");
 		if (isChar) {
 			gameObject.GetComponent<Character> ().ApplyDamage (damage);
 		} else {
 			if (transform.tag == "Heart") {
+				gemHolder_scr.hp--;
 				//Lose level hp
 				StartCoroutine("MatchAnimation");
 			}
