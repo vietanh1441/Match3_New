@@ -2,9 +2,12 @@
 using System.Collections;
 
 public class Monster : MonoBehaviour {
-
+	public int maxHp;
 	public int hp, atk;
-	
+	public bool up,down,right,left;
+	public GameObject hpSlider_obj;
+	public UISlider hpSlider;
+	public Vector2[] hitPos = new Vector2[5];
 	public int turnCount = 0;
 	private GameObject gemHolder_obj;
 	private GemHolder gemHolder_scr;
@@ -26,12 +29,27 @@ public class Monster : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+
+
+
+		hp = maxHp;
+		InitHpBar();
 		gemHolder_obj = GameObject.Find ("GemHolder");
 		gemHolder_scr = gemHolder_obj.GetComponent<GemHolder> ();
 		transform.parent = gemHolder_obj.transform;
 		gemHolder_scr.monsterList.Add (gameObject);
+
 	}
 	
+	void InitHpBar()
+	{
+		//GameObject g = Instantiate(hpSlider_obj, transform.position, Quaternion.identity)as GameObject;
+		//g.transform.parent = GameObject.Find ("UI Root").transform;
+		GameObject g = NGUITools.AddChild(GameObject.Find ("UI Root"), hpSlider_obj);
+		hpSlider = g.GetComponent<UISlider>();
+		g.SendMessage("FollowTarget",transform);
+		DisplayHpBar();
+	}
 
 	void DoAction()
 	{
@@ -40,12 +58,59 @@ public class Monster : MonoBehaviour {
 			//Color tile
 		} else if (turnCount % 3 == 1) {
 			//Hit tiles
-			HitTile (1,0);
+			Attacking();
 		} else if (turnCount % 3 == 2) {
 			//Moving
 		}
 		turnCount++;
 		Invoke ("FinishAction", 2);
+	}
+
+	void Attacking()
+	{
+		Vector2 pos;
+	
+		for(int i = 0; i < hitPos.Length; i++)
+		{
+			if(hitPos[i]!=null)
+				pos = hitPos[i];
+
+			if(up)
+				HitTile(pos);
+			if(down)
+				HitTile(Downize(pos));
+			if(right)
+				HitTile(Rightize(pos));
+			if(left)
+				HitTile(Leftize(pos));
+		}
+		//HitTile (1,0);
+	}
+
+	static Vector2 Downize(Vector2 pos)
+	{
+		Vector2 tmp;
+		pos.x = -pos.x;
+		pos.y = - pos.y;
+		return pos;
+	}
+
+	static Vector2 Rightize(Vector2 pos)
+	{
+		Vector2 tmp;
+		tmp.x = pos.x;
+		pos.x = pos.y;
+		pos.y = -tmp.x;
+		return pos;
+	}
+
+	static Vector2 Leftize(Vector2 pos)
+	{
+		Vector2 tmp;
+		tmp.x = pos.x;
+		pos.x = -pos.y;
+		pos.y = tmp.x;
+		return pos;
 	}
 
 	void FinishAction()
@@ -59,6 +124,13 @@ public class Monster : MonoBehaviour {
 		d.SendMessage("SetDamage",atk);
 	}
 
+
+	void HitTile(Vector2 v)
+	{
+		GameObject d = Instantiate(damager, new Vector3(transform.position.x + v.x, transform.position.y + v.y, transform.position.z), Quaternion.identity) as GameObject;
+		d.SendMessage("SetDamage",atk);
+	}
+
 	void ApplyDamage(int damage)
 	{
 		Debug.Log ("Damage Applied");
@@ -67,10 +139,18 @@ public class Monster : MonoBehaviour {
 		{
 			Destroy(gameObject);
 		}
+
+		DisplayHpBar();
 	}
 
 	void OnDestroy()
 	{
 		gemHolder_scr.monsterList.Remove(gameObject);
+	}
+
+	void DisplayHpBar()
+	{
+		Debug.Log (hp/maxHp);
+		hpSlider.value = (float)hp/maxHp;
 	}
 }

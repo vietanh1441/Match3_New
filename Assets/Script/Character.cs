@@ -3,8 +3,8 @@ using System.Collections;
 
 public class Character : MonoBehaviour {
 
+	public int maxHp = 5;
 	public int hp, atk;
-
 	//The type of character: 
 	/// <summary>
 	/// 1: swordman
@@ -16,7 +16,8 @@ public class Character : MonoBehaviour {
 	public int type;
 	public GameObject damager;
 	private bool up = false, down= false, right=false, left=false;
-
+	public GameObject hpSlider_obj;
+	public UISlider hpSlider;
 	private GameObject gemHolder_obj;
 	private GemHolder gemHolder_scr;
 	public int XCoord
@@ -35,10 +36,20 @@ public class Character : MonoBehaviour {
 	}
 	// Use this for initialization
 	void Start () {
+		hp = maxHp;
 		gemHolder_obj = GameObject.Find ("GemHolder");
 		gemHolder_scr = gemHolder_obj.GetComponent<GemHolder> ();
+	//	DisplayHpBar();
 	}
-	
+
+	void InitHpBar()
+	{
+		GameObject g = Instantiate(hpSlider_obj, transform.position, Quaternion.identity)as GameObject;
+		g.transform.parent = GameObject.Find ("UI Root").transform;
+		hpSlider = g.GetComponent<UISlider>();
+		DisplayHpBar();
+	}
+
 	// Update is called once per frame
 	void Update () {
 	
@@ -50,6 +61,7 @@ public class Character : MonoBehaviour {
 		if (hp <= 0) {
 			Death();
 		}
+		DisplayHpBar();
 	}
 
 	public void Death()
@@ -230,5 +242,11 @@ public class Character : MonoBehaviour {
 	void OnDestroy()
 	{
 		gemHolder_scr.characterList.Remove(gameObject);
+	}
+
+	void DisplayHpBar()
+	{
+		Debug.Log (hp/maxHp);
+		hpSlider.value = (float)hp/maxHp;
 	}
 }

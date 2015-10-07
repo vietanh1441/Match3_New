@@ -1,11 +1,11 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Script\Gem.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Script\Monster.cs">
     <Files>
-      <File FileName="Match3_New.sln" Line="1" Column="1" />
-      <File FileName="Assets\Script\GemHolder.cs" Line="163" Column="3" />
-      <File FileName="Assets\Script\Gem.cs" Line="265" Column="30" />
-      <File FileName="Assets\Script\DamageMaker.cs" Line="1" Column="1" />
+      <File FileName="Assets\NGUI\Examples\Scripts\Other\PlayIdleAnimations.cs" Line="88" Column="4" />
+      <File FileName="Assets\Script\Monster.cs" Line="36" Column="15" />
+      <File FileName="Assets\Script\Character.cs" Line="53" Column="36" />
+      <File FileName="Assets\HUD Text\Scripts\UIFollowTarget.cs" Line="131" Column="14" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
