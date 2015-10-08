@@ -9,6 +9,7 @@ public class Gem : MonoBehaviour {
 	public int color;
 	bool release = true;
 	bool ready = false;
+	bool detonate = false;
 
 	//if gems is a character
 	public bool isChar;
@@ -266,6 +267,7 @@ public class Gem : MonoBehaviour {
 
 	IEnumerator MatchAnimation()
 	{
+		detonate = true;
 		if(transform.CompareTag("Trap"))
 		{
 			DealDamage(XCoord,YCoord+1);
@@ -290,6 +292,7 @@ public class Gem : MonoBehaviour {
 
 	public void ApplyDamage(int damage)
 	{
+
 		//Debug.Log ("ApplyDamage");
 		if (isChar) {
 			gameObject.GetComponent<Character> ().ApplyDamage (damage);
@@ -301,7 +304,14 @@ public class Gem : MonoBehaviour {
 			}
 			else
 			{
+				if(detonate == true)
+				{
+
+				}
+				else
+				{
 				StartCoroutine("MatchAnimation");
+				}
 			}
 		}
 	}

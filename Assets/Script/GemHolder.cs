@@ -11,6 +11,7 @@ public class GemHolder : MonoBehaviour {
 	public GameObject[] charPrefab;
 	public GameObject floorPrefab;
 	public int hp = 10;
+	public List<GameObject> darkMagicList = new List<GameObject>();
 	//public GameObject[] monsterPrefab;
 	//private bool[,] mark_to_create = new bool[10, 10];
 	public List<GameObject> characterList = new List<GameObject>();
