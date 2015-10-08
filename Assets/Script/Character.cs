@@ -17,9 +17,14 @@ public class Character : MonoBehaviour {
 	public GameObject damager;
 	private bool up = false, down= false, right=false, left=false;
 	public GameObject hpSlider_obj;
+	public GameObject hud_obj;
+	public HUDText hd;
 	public UISlider hpSlider;
+	public Transform hpBar, damageHUD;
+
 	private GameObject gemHolder_obj;
 	private GemHolder gemHolder_scr;
+	public Vector3 hpBarScale = new Vector3(1,1,1);
 	public int XCoord
 	{
 		get
@@ -37,18 +42,27 @@ public class Character : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		hp = maxHp;
+		InitUI();
 		gemHolder_obj = GameObject.Find ("GemHolder");
 		gemHolder_scr = gemHolder_obj.GetComponent<GemHolder> ();
 	//	DisplayHpBar();
 	}
 
-	void InitHpBar()
+	void InitUI()
 	{
-		GameObject g = Instantiate(hpSlider_obj, transform.position, Quaternion.identity)as GameObject;
-		g.transform.parent = GameObject.Find ("UI Root").transform;
+		//GameObject g = Instantiate(hpSlider_obj, transform.position, Quaternion.identity)as GameObject;
+		//g.transform.parent = GameObject.Find ("UI Root").transform;
+		GameObject g = NGUITools.AddChild(GameObject.Find ("UI Root"), hpSlider_obj);
 		hpSlider = g.GetComponent<UISlider>();
+		GameObject h = NGUITools.AddChild(GameObject.Find ("UI Root"), hud_obj);
+		hd = h.GetComponent<HUDText>();
+		h.SendMessage("FollowTarget",  damageHUD);
+		g.transform.localScale = hpBarScale;
+		g.SendMessage("FollowTarget",hpBar);
 		DisplayHpBar();
+
 	}
+
 
 	// Update is called once per frame
 	void Update () {
@@ -58,6 +72,7 @@ public class Character : MonoBehaviour {
 	public void ApplyDamage(int damage)
 	{
 		hp = hp - damage;
+		hd.Add(-damage, Color.red, 3);
 		if (hp <= 0) {
 			Death();
 		}

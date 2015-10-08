@@ -58,7 +58,7 @@ public class Gem : MonoBehaviour {
 			if (color == 0)
 			{
 				transform.tag = "Sword";
-				//spriteRenderer.sprite = ;
+
 			}
 			if (color == 1)
 			{
@@ -80,6 +80,7 @@ public class Gem : MonoBehaviour {
 				transform.tag = "Trap";
 				//spriteRenderer.color = Color.gray;
 			}
+			spriteRenderer.sprite = color_sprite[color];
 			transform.localScale = new Vector3(0.9f,0.9f,0.9f);
 			//Debug.Log ("Ready");
 		}
@@ -89,10 +90,9 @@ public class Gem : MonoBehaviour {
 
 	void Start () 
 	{
-		if(!isChar)
-		{
-			transform.localScale = new Vector3(0.5f,0.5f,0.5f);
-		}
+	
+			transform.localScale = new Vector3(0.9f,0.9f,0.9f);
+
 		gemHolder_obj = GameObject.Find ("GemHolder");
 		gemHolder_scr = gemHolder_obj.GetComponent<GemHolder> ();
 		spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
@@ -122,21 +122,22 @@ public class Gem : MonoBehaviour {
 	/// </summary>
 	void Init_color()
 	{
+		transform.tag = "Unready";
 		int color_num = 5;
 		color = Random.Range(0, color_num);
 		if (color == 0)
 		{
-			transform.tag = "Sword";
+			//transform.tag = "Sword";
 			spriteRenderer.sprite  = color_sprite[color];
 		}
 		if (color == 1)
 		{
-			transform.tag = "Bow";
+			//transform.tag = "Bow";
 			spriteRenderer.sprite  = color_sprite[color];
 		}
 		if (color == 2)
 		{
-			transform.tag = "Magic";
+		//	transform.tag = "Magic";
 			spriteRenderer.sprite  = color_sprite[color];
 		}
 		if (color == 3)
@@ -146,10 +147,11 @@ public class Gem : MonoBehaviour {
 		}
 		if(color== 4)
 		{
-			transform.tag = "Trap";
+			//transform.tag = "Trap";
 			spriteRenderer.sprite  = color_sprite[color];
 		}
-		transform.tag = "Unready";
+		spriteRenderer.sprite = color_sprite[color+5];
+		//transform.tag = "Unready";
 	}
 
 	void OnMouseDown()
@@ -264,10 +266,26 @@ public class Gem : MonoBehaviour {
 
 	IEnumerator MatchAnimation()
 	{
+		if(transform.CompareTag("Trap"))
+		{
+			DealDamage(XCoord,YCoord+1);
+			DealDamage(XCoord,YCoord-1);
+			DealDamage(XCoord+1,YCoord);
+			DealDamage(XCoord-1,YCoord);
+
+		}
 		transform.localScale = new Vector3(0.5f,0.5f,0.5f);
 		yield return new WaitForSeconds (1f);
 		//gemHolder_scr.CreateNewGem(XCoord, YCoord);
 		Destroy (gameObject);
+	}
+
+	void DealDamage(int x,int y)
+	{
+		if(gemHolder_scr.gems[x,y] != null)
+		{
+			gemHolder_scr.gems[x,y].SendMessage("ApplyDamage",1);
+		}
 	}
 
 	public void ApplyDamage(int damage)

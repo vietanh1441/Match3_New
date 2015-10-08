@@ -4,10 +4,12 @@ using System.Collections.Generic;
 
 public class GemHolder : MonoBehaviour {
 	public GameObject[,] gems = new GameObject[15,15];
+	public GameObject[,] floors = new GameObject[15,15];
 	public int GridWidth = 5;
 	public int GridHeight = 5;
 	public GameObject gemPrefab;
 	public GameObject[] charPrefab;
+	public GameObject floorPrefab;
 	public int hp = 10;
 	//public GameObject[] monsterPrefab;
 	//private bool[,] mark_to_create = new bool[10, 10];
@@ -33,6 +35,7 @@ public class GemHolder : MonoBehaviour {
 			for(int x=1;x<GridWidth;x++)
 			{
 				CreateNewGem(x,y);
+				CreateNewFloor(x,y);
 			//	mark_to_create[x,y] = false;
 //				gems.Add(g.GetComponent<Gem>());
 			}
@@ -248,6 +251,16 @@ public class GemHolder : MonoBehaviour {
 	/// 
 	public void CheckMonster()
 	{
+
+		for(int y=1;y<GridHeight;y++)
+		{
+			for(int x=1;x<GridWidth;x++)
+			{ 
+				if(floors[x,y] !=null)
+				floors[x,y].SendMessage("ChangeColor", Color.white);
+			}
+		}
+
 		Debug.Log ("CheckMonster");
 		charfinish = 0;
 		//Do Character stuff
@@ -324,6 +337,15 @@ public class GemHolder : MonoBehaviour {
 			g.transform.parent = gameObject.transform;
 			gems [x, y] = g;
 
+	}
+
+	public void CreateNewFloor(int x, int y)
+	{
+		
+		GameObject g = Instantiate (floorPrefab, new Vector3 (x, y, 5), Quaternion.identity)as GameObject;
+		g.transform.parent = gameObject.transform;
+		floors [x, y] = g;
+		
 	}
 
 	/// <summary>

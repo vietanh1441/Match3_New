@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\DamageTooltip.cs" />
+     <Compile Include="Assets\Floor.cs" />
      <Compile Include="Assets\HUD Text\Examples\Scripts\ChatManager.cs" />
      <Compile Include="Assets\HUD Text\Examples\Scripts\ChatParticipant.cs" />
      <Compile Include="Assets\HUD Text\Examples\Scripts\ColliderDisplayText.cs" />

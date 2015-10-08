@@ -1,11 +1,16 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Script\Monster.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Script\Gem.cs">
     <Files>
-      <File FileName="Assets\NGUI\Examples\Scripts\Other\PlayIdleAnimations.cs" Line="88" Column="4" />
-      <File FileName="Assets\Script\Monster.cs" Line="36" Column="15" />
-      <File FileName="Assets\Script\Character.cs" Line="53" Column="36" />
-      <File FileName="Assets\HUD Text\Scripts\UIFollowTarget.cs" Line="131" Column="14" />
+      <File FileName="Assets\Script\Monster.cs" Line="169" Column="32" />
+      <File FileName="Assets\NGUI\Examples\Scripts\Other\PlayIdleAnimations.cs" Line="1" Column="1" />
+      <File FileName="Assets\Script\Character.cs" Line="63" Column="3" />
+      <File FileName="Assets\HUD Text\Scripts\UIFollowTarget.cs" Line="1" Column="1" />
+      <File FileName="Assets\HUD Text\Scripts\HUDText.cs" Line="1" Column="1" />
+      <File FileName="Assets\Script\GemHolder.cs" Line="257" Column="32" />
+      <File FileName="Assets\Floor.cs" Line="5" Column="1" />
+      <File FileName="Assets\Script\DamageMaker.cs" Line="26" Column="8" />
+      <File FileName="Assets\Script\Gem.cs" Line="277" Column="54" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
