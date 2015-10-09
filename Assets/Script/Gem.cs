@@ -6,10 +6,12 @@ public class Gem : MonoBehaviour {
 	//Set up for changing sprite color
 	public Sprite[] color_sprite = new Sprite[5];
 	private SpriteRenderer spriteRenderer;
+	UISlider hpSlider;
 	public int color;
 	bool release = true;
 	bool ready = false;
 	bool detonate = false;
+	public GameObject timer;
 
 	//if gems is a character
 	public bool isChar;
@@ -91,7 +93,8 @@ public class Gem : MonoBehaviour {
 
 	void Start () 
 	{
-	
+		timer = GameObject.FindGameObjectWithTag("Timer");
+		hpSlider = timer.GetComponent<UISlider>();
 			transform.localScale = new Vector3(0.9f,0.9f,0.9f);
 
 		gemHolder_obj = GameObject.Find ("GemHolder");
@@ -159,9 +162,13 @@ public class Gem : MonoBehaviour {
 	{
 		if (isChar)
 			return;
-		Debug.Log ("CheckStatus");
-		Debug.Log ((int)gemHolder_scr.status);
+
+	//	Debug.Log ("CheckStatus");
+	//	Debug.Log ((int)gemHolder_scr.status);
 		if ((int)gemHolder_scr.status == 0) {
+			hpSlider.value = 100;
+			timer.GetComponent<UIFollowTarget>().enabled = true;
+			timer.SendMessage("FollowTarget", transform);
 			Debug.Log ("Called Mouse Down");
 			offset = gameObject.transform.position - Camera.main.ScreenToWorldPoint (new Vector3 (Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
 			Invoke ("ForceMouseUp", 5);
@@ -175,6 +182,7 @@ public class Gem : MonoBehaviour {
 		if (isChar)
 			return;
 		if (release == false &&(int)gemHolder_scr.status == 0 ) {
+			hpSlider.value = hpSlider.value-Time.deltaTime/5; 
 			Vector3 curScreenPoint = new Vector3 (Input.mousePosition.x, Input.mousePosition.y, screenPoint.z);
 			Vector3 curPosition = Camera.main.ScreenToWorldPoint (curScreenPoint) + offset;
 			if (curPosition.x >= gemHolder_scr.GridWidth+5 - 0.5f || curPosition.x <= 4.5f) {
@@ -226,6 +234,9 @@ public class Gem : MonoBehaviour {
 
 	public void Release()
 	{
+
+		timer.GetComponent<UIFollowTarget>().enabled = false;
+		timer.transform.position = new Vector3(-875,877,0);
 		if ((int)gemHolder_scr.status == 0)
 		{
 			//Debug.Log ("RELEASE");
