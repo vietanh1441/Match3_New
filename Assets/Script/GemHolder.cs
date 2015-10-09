@@ -31,9 +31,9 @@ public class GemHolder : MonoBehaviour {
 		status = Status.Ready;
 		//currentStatus = (int)Status.NewTurn;
 
-		for(int y=1;y<GridHeight;y++)
+		for(int y=5;y<GridHeight+5;y++)
 		{
-			for(int x=1;x<GridWidth;x++)
+			for(int x=5;x<GridWidth+5;x++)
 			{
 				CreateNewGem(x,y);
 				CreateNewFloor(x,y);
@@ -66,8 +66,8 @@ public class GemHolder : MonoBehaviour {
 	public void PutInCharacter()
 	{
 		for (int i = 0; i < charPrefab.Length; i++) {
-			int x = Random.Range (1,GridWidth);
-			int y = Random.Range(1,GridHeight);
+			int x = Random.Range (5,GridWidth+5);
+			int y = Random.Range(5,GridHeight+5);
 
 			Destroy (gems[x,y]);
 
@@ -205,9 +205,9 @@ public class GemHolder : MonoBehaviour {
 	{
 		Debug.Log ("CheckBoard");
 		//Check whole board for match, if it's indeed match, mark them
-		for(int y=1;y<GridHeight;y++)
+		for(int y=5;y<GridHeight+5;y++)
 		{
-			for(int x=1;x<GridWidth;x++)
+			for(int x=5;x<GridWidth+5;x++)
 			{
 				Check(gems[x,y]);
 			}
@@ -223,9 +223,9 @@ public class GemHolder : MonoBehaviour {
 
 	public void DestroyMarkedTile()
 	{
-		for(int y=1;y<GridHeight;y++)
+		for(int y=5;y<GridHeight+5;y++)
 		{
-			for(int x=1;x<GridWidth;x++)
+			for(int x=5;x<GridWidth+5;x++)
 			{
 				gems[x,y].SendMessage("DestroyMarked");
 				
@@ -235,9 +235,9 @@ public class GemHolder : MonoBehaviour {
 
 	public void ReadyForNewTurn()
 	{
-		for(int y=1;y<GridHeight;y++)
+		for(int y=5;y<GridHeight+5;y++)
 		{
-			for(int x=1;x<GridWidth;x++)
+			for(int x=5;x<GridWidth+5;x++)
 			{
 				if(gems[x,y] != null)
 				gems[x,y].SendMessage("NewTurn");
@@ -253,9 +253,9 @@ public class GemHolder : MonoBehaviour {
 	public void CheckMonster()
 	{
 
-		for(int y=1;y<GridHeight;y++)
+		for(int y=5;y<GridHeight+5;y++)
 		{
-			for(int x=1;x<GridWidth;x++)
+			for(int x=5;x<GridWidth+5;x++)
 			{ 
 				if(floors[x,y] !=null)
 				floors[x,y].SendMessage("ChangeColor", Color.white);
@@ -289,9 +289,9 @@ public class GemHolder : MonoBehaviour {
 
 	public void Replenished()
 	{
-		for(int y=1;y<GridHeight;y++)
+		for(int y=5;y<GridHeight+5;y++)
 		{
-			for(int x=1;x<GridWidth;x++)
+			for(int x=5;x<GridWidth+5;x++)
 			{
 				//gems[x,y].SendMessage("NewTurn");
 				if(gems[x,y] == null)
@@ -312,7 +312,7 @@ public class GemHolder : MonoBehaviour {
 		Debug.Log ("NewTurn");
 
 		//Ready all gems
-		ReadyForNewTurn();
+		//ReadyForNewTurn();
 
 		//Recreate all lost gems
 		Replenished();
@@ -447,7 +447,7 @@ public class GemHolder : MonoBehaviour {
 		//if it's already in the list then there is no need to continue
 
 
-		while (x-1 >= 1) {
+		while (x-1 >= 5) {
 			if(bigList.Contains(gems[x-1,y]))
 			{
 				break;
@@ -501,7 +501,7 @@ public class GemHolder : MonoBehaviour {
 			}
 		}
 		//get down side
-		while (y-1 >= 1) {
+		while (y-1 >= 5) {
 			if(bigList.Contains(gems[x,y-1]))
 			{
 				break;

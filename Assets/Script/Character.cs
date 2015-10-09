@@ -14,6 +14,7 @@ public class Character : MonoBehaviour {
 	/// 5: ...
 	/// </summary>
 	public int type;
+	public SkillSet skillSet;
 	public GameObject damager;
 	private bool up = false, down= false, right=false, left=false;
 	public GameObject hpSlider_obj;
@@ -21,7 +22,7 @@ public class Character : MonoBehaviour {
 	public HUDText hd;
 	public UISlider hpSlider;
 	public Transform hpBar, damageHUD;
-
+	public Vector2[] hitPos = new Vector2[5];
 	private GameObject gemHolder_obj;
 	private GemHolder gemHolder_scr;
 	public Vector3 hpBarScale = new Vector3(1,1,1);
@@ -41,6 +42,7 @@ public class Character : MonoBehaviour {
 	}
 	// Use this for initialization
 	void Start () {
+		skillSet = GameObject.Find("SkillSet").GetComponent<SkillSet>();
 		hp = maxHp;
 		InitUI();
 		gemHolder_obj = GameObject.Find ("GemHolder");
@@ -86,6 +88,11 @@ public class Character : MonoBehaviour {
 
 	public void DoAction()
 	{
+		if(type == 0)
+		{
+			Check();
+		}
+
 		//Debug.Log ("Character Do Action");
 		if(type==1)
 		{
@@ -93,6 +100,12 @@ public class Character : MonoBehaviour {
 		}
 
 		Invoke ("FinishAction", 1);
+	}
+
+	void Check()
+	{
+		//bool up, down, right, left
+		CheckSkill(0);
 	}
 
 	int SwordMan()
@@ -124,6 +137,218 @@ public class Character : MonoBehaviour {
 
 		return 1;
 	}
+
+
+	//Check type 1 skill
+	//get the shape and the string
+	//Compare, if correct, mark all tiles and deal damage
+	void CheckSkill(int skill)
+	{
+		bool up = true,down=true,right=true,left=true;
+		//bool b = true;
+		Vector2[] v = skillSet.LoopUpVector(skill, type);
+		string[] s = skillSet.LookUpElement(skill, type);
+		GameObject[] g = new GameObject[10];
+		for(int i = 0; i < v.Length; i++)
+		{
+			//Debug.Log (v[i]);
+			if(v[i].x == 0 && v[i].y == 0)
+			{
+				break;
+			}
+			g[i] = gemHolder_scr.gems[XCoord+(int)v[i].x, YCoord+(int)v[i].y];
+			if(g[i] != null)
+			{
+				if(g[i].transform.tag != s[i])
+				{
+					up = false;
+					break;
+				}
+			}
+		}
+
+		v = skillSet.LoopUpVector(skill, type);
+		for(int i = 0; i < v.Length; i++)
+		{
+			//Debug.Log (v[i]);
+			v[i] = Downize(v[i]);
+			if(v[i].x == 0 && v[i].y == 0)
+			{
+				break;
+			}
+			g[i] = gemHolder_scr.gems[XCoord+(int)v[i].x, YCoord+(int)v[i].y];
+			if(g[i] != null)
+			{
+				if(g[i].transform.tag != s[i])
+				{
+					down = false;
+					break;
+				}
+			}
+		}
+		v = skillSet.LoopUpVector(skill, type);
+		for(int i = 0; i < v.Length; i++)
+		{
+			//Debug.Log (v[i]);
+			v[i] = Rightize(v[i]);
+			if(v[i].x == 0 && v[i].y == 0)
+			{
+				break;
+			}
+			g[i] = gemHolder_scr.gems[XCoord+(int)v[i].x, YCoord+(int)v[i].y];
+			if(g[i] != null)
+			{
+				if(g[i].transform.tag != s[i])
+				{
+					right = false;
+					break;
+				}
+			}
+		}
+		v = skillSet.LoopUpVector(skill, type);
+		for(int i = 0; i < v.Length; i++)
+		{
+
+			v[i] = Leftize(v[i]);
+			Debug.Log (v[i]);
+			if(v[i].x == 0 && v[i].y == 0)
+			{
+				break;
+			}
+			g[i] = gemHolder_scr.gems[XCoord+(int)v[i].x, YCoord+(int)v[i].y];
+			if(g[i] != null)
+			{
+				if(g[i].transform.tag != s[i])
+				{
+					left = false;
+					break;
+				}
+			}
+		}
+		Debug.Log (up);
+		Debug.Log (down);
+		Debug.Log (right);
+		Debug.Log (left);
+
+		//Mark tiles and deal damage
+		 v = skillSet.LoopUpVector(skill, type);
+		Vector2[] vs = skillSet.LookUpDamageTile(skill, type);
+		int damage = skillSet.LookUpDamage(skill, type , 1);
+		GameObject a;
+		if(up)
+		{
+			for(int i = 0; i < v.Length; i++)
+			{
+				if(v[i].x == 0 && v[i].y == 0)
+				{
+					break;
+				}
+				a = gemHolder_scr.gems[XCoord+(int)v[i].x, YCoord+(int)v[i].y] ;
+				if(a != null)
+				{
+					a.SendMessage("Mark",1);
+				}
+			}
+			for(int i = 0; i < vs.Length; i++)
+			{
+				//Debug.Log (v[i]);
+				if(vs[i].x == 0 && vs[i].y == 0)
+				{
+					break;
+				}
+				HitTile(vs[i],damage);
+
+			}
+		}
+
+		v = skillSet.LoopUpVector(skill, type);
+		 vs = skillSet.LookUpDamageTile(skill, type);
+		if(down)
+		{
+			for(int i = 0; i < v.Length; i++)
+			{
+				v[i] = Downize(v[i]);
+				if(v[i].x == 0 && v[i].y == 0)
+				{
+					break;
+				}
+				a = gemHolder_scr.gems[XCoord+(int)v[i].x, YCoord+(int)v[i].y];
+				if(a != null)
+				{
+					a.SendMessage("Mark",1);
+				}
+			}
+			for(int i = 0; i < vs.Length; i++)
+			{
+				vs[i] = Downize(vs[i]);
+				//Debug.Log (v[i]);
+				if(vs[i].x == 0 && vs[i].y == 0)
+				{
+					break;
+				}
+				HitTile(vs[i],damage);
+			}
+		}
+		v = skillSet.LoopUpVector(skill, type);
+		vs = skillSet.LookUpDamageTile(skill, type);
+		if(right)
+		{
+			for(int i = 0; i < v.Length; i++)
+			{
+				v[i] = Rightize(v[i]);
+				if(v[i].x == 0 && v[i].y == 0)
+				{
+					break;
+				}
+				a = gemHolder_scr.gems[XCoord+(int)v[i].x, YCoord+(int)v[i].y] ;
+				if(a != null)
+				{
+					a.SendMessage("Mark",1);
+				}
+			}
+			for(int i = 0; i < vs.Length; i++)
+			{
+				vs[i] = Rightize(vs[i]);
+				//Debug.Log (v[i]);
+				if(vs[i].x == 0 && vs[i].y == 0)
+				{
+					break;
+				}
+				HitTile(vs[i],damage);
+			}
+		}
+
+		v = skillSet.LoopUpVector(skill, type);
+		vs = skillSet.LookUpDamageTile(skill, type);
+		if(left)
+		{
+			for(int i = 0; i < v.Length; i++)
+			{
+				v[i] = Leftize(v[i]);
+				if(v[i].x == 0 && v[i].y == 0)
+				{
+					break;
+				}
+				a = gemHolder_scr.gems[XCoord+(int)v[i].x, YCoord+(int)v[i].y] ;
+				if(a != null)
+				{
+					a.SendMessage("Mark",1);
+				}
+			}
+			for(int i = 0; i < vs.Length; i++)
+			{
+				vs[i] =  Leftize(vs[i]);
+				//Debug.Log (v[i]);
+				if(vs[i].x == 0 && vs[i].y == 0)
+				{
+					break;
+				}
+				HitTile(vs[i],damage);
+			}
+		}
+		//return b;
+	}
+
 
 	/// <summary>
 	/// - 0 -
@@ -254,6 +479,12 @@ public class Character : MonoBehaviour {
 		d.SendMessage("SetDamage",atk);
 	}
 
+	void HitTile(Vector2 v, int dam)
+	{
+		GameObject d = Instantiate(damager, new Vector3(transform.position.x + v.x, transform.position.y + v.y, transform.position.z), Quaternion.identity) as GameObject;
+		d.SendMessage("SetDamage",dam);
+	}
+
 	void OnDestroy()
 	{
 		gemHolder_scr.characterList.Remove(gameObject);
@@ -264,4 +495,31 @@ public class Character : MonoBehaviour {
 		Debug.Log (hp/maxHp);
 		hpSlider.value = (float)hp/maxHp;
 	}
+
+	static Vector2 Downize(Vector2 pos)
+	{
+		Vector2 tmp;
+		pos.x = -pos.x;
+		pos.y = - pos.y;
+		return pos;
+	}
+	
+	static Vector2 Rightize(Vector2 pos)
+	{
+		Vector2 tmp;
+		tmp.x = pos.x;
+		pos.x = pos.y;
+		pos.y = -tmp.x;
+		return pos;
+	}
+	
+	static Vector2 Leftize(Vector2 pos)
+	{
+		Vector2 tmp;
+		tmp.x = pos.x;
+		pos.x = -pos.y;
+		pos.y = tmp.x;
+		return pos;
+	}
+
 }

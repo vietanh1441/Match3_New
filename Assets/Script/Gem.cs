@@ -50,7 +50,7 @@ public class Gem : MonoBehaviour {
 		}
 	}
 
-	public void NewTurn()
+	/*public void NewTurn()
 	{
 
 		//Get the gem ready if it's not, change its tag to its appropriate color
@@ -58,17 +58,17 @@ public class Gem : MonoBehaviour {
 			ready = true;
 			if (color == 0)
 			{
-				transform.tag = "Sword";
+				transform.tag = "Fire";
 
 			}
 			if (color == 1)
 			{
-				transform.tag = "Bow";
+				transform.tag = "Tree";
 				//spriteRenderer.color = Color.blue;
 			}
 			if (color == 2)
 			{
-				transform.tag = "Magic";
+				transform.tag = "Water";
 			//	spriteRenderer.color = Color.red;
 			}
 			if (color == 3)
@@ -78,7 +78,7 @@ public class Gem : MonoBehaviour {
 			}
 			if(color== 4)
 			{
-				transform.tag = "Trap";
+				transform.tag = "Dark";
 				//spriteRenderer.color = Color.gray;
 			}
 			spriteRenderer.sprite = color_sprite[color];
@@ -87,7 +87,7 @@ public class Gem : MonoBehaviour {
 		}
 
 
-	}
+	}*/
 
 	void Start () 
 	{
@@ -123,35 +123,35 @@ public class Gem : MonoBehaviour {
 	/// </summary>
 	void Init_color()
 	{
-		transform.tag = "Unready";
+		//transform.tag = "Unready";
 		int color_num = 5;
 		color = Random.Range(0, color_num);
 		if (color == 0)
 		{
-			//transform.tag = "Sword";
-			spriteRenderer.sprite  = color_sprite[color];
+			transform.tag = "Fire";
+			//spriteRenderer.sprite  = color_sprite[color];
 		}
 		if (color == 1)
 		{
-			//transform.tag = "Bow";
-			spriteRenderer.sprite  = color_sprite[color];
+			transform.tag = "Tree";
+			//spriteRenderer.sprite  = color_sprite[color];
 		}
 		if (color == 2)
 		{
-		//	transform.tag = "Magic";
-			spriteRenderer.sprite  = color_sprite[color];
+			transform.tag = "Water";
+			//spriteRenderer.sprite  = color_sprite[color];
 		}
 		if (color == 3)
 		{
 			transform.tag = "Heart";
-			spriteRenderer.sprite  = color_sprite[color];
+			//spriteRenderer.sprite  = color_sprite[color];
 		}
 		if(color== 4)
 		{
-			//transform.tag = "Trap";
-			spriteRenderer.sprite  = color_sprite[color];
+			transform.tag = "Dark";
+			//spriteRenderer.sprite  = color_sprite[color];
 		}
-		spriteRenderer.sprite = color_sprite[color+5];
+		spriteRenderer.sprite = color_sprite[color];
 		//transform.tag = "Unready";
 	}
 
@@ -177,11 +177,11 @@ public class Gem : MonoBehaviour {
 		if (release == false &&(int)gemHolder_scr.status == 0 ) {
 			Vector3 curScreenPoint = new Vector3 (Input.mousePosition.x, Input.mousePosition.y, screenPoint.z);
 			Vector3 curPosition = Camera.main.ScreenToWorldPoint (curScreenPoint) + offset;
-			if (curPosition.x >= gemHolder_scr.GridWidth - 0.5f || curPosition.x <= 0.5f) {
+			if (curPosition.x >= gemHolder_scr.GridWidth+5 - 0.5f || curPosition.x <= 4.5f) {
 				curPosition.x = curX;
 			}
 
-			if (curPosition.y >= gemHolder_scr.GridHeight - 0.5f || curPosition.y <= 0.5f) {
+			if (curPosition.y >= gemHolder_scr.GridHeight+5 - 0.5f || curPosition.y <= 4.5f) {
 				curPosition.y = curY;
 			}
 
@@ -268,7 +268,7 @@ public class Gem : MonoBehaviour {
 	IEnumerator MatchAnimation()
 	{
 		detonate = true;
-		if(transform.CompareTag("Trap"))
+		if(transform.CompareTag("Dark"))
 		{
 			DealDamage(XCoord,YCoord+1);
 			DealDamage(XCoord,YCoord-1);

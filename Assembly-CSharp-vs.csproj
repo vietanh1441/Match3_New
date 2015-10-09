@@ -200,6 +200,7 @@
      <Compile Include="Assets\Script\Gem.cs" />
      <Compile Include="Assets\Script\GemHolder.cs" />
      <Compile Include="Assets\Script\Monster.cs" />
+     <Compile Include="Assets\SkillSet.cs" />
      <None Include="Assets\NGUI\Examples\Shaders\Unlit - Depth Cutout.shader" />
      <None Include="Assets\NGUI\ReadMe - 3.9.4.txt" />
      <None Include="Assets\NGUI\Resources\Shaders\Unlit - Transparent Masked 1.shader" />
