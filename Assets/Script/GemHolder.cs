@@ -10,7 +10,12 @@ public class GemHolder : MonoBehaviour {
 	public GameObject gemPrefab;
 	public GameObject[] charPrefab;
 	public GameObject floorPrefab;
-	public int hp = 10;
+	private int turnCount=0;
+	private int ult_turn, cap_turn;
+
+	public bool ult_active = false;
+	public bool cap_active = false;
+	//public int hp = 10;
 	public List<GameObject> darkMagicList = new List<GameObject>();
 	//public GameObject[] monsterPrefab;
 	//private bool[,] mark_to_create = new bool[10, 10];
@@ -23,11 +28,19 @@ public class GemHolder : MonoBehaviour {
 	public enum Status { Ready, CheckChar, CheckBoard, CheckMonster, NewTurn} ;
 	public Status status;
 
+	//general ultimate/capture/hp
+	public int hp = 10, maxhp=10, ult = 0, maxUlt = 100, cap= 0, maxCap=100;
+	public GameObject PowerBar, HpBar, HoTBar;
+	UISlider PowerSlider, HpSlider, HoTSlider;
+	UILabel PowerLabel, HpLabel, HoTLabel;
 
 	//public int currentStatus;
 
 	void Start () 
 	{
+
+		hp = maxhp;
+		InitUI();
 		status = Status.Ready;
 		//currentStatus = (int)Status.NewTurn;
 
@@ -43,8 +56,29 @@ public class GemHolder : MonoBehaviour {
 		}
 
 		PutInCharacter ();
-
+		Display();
 	//	PutInMonster ();
+	}
+
+	void InitUI()
+	{
+		PowerSlider = PowerBar.GetComponent<UISlider>();
+		HpSlider = HpBar.GetComponent<UISlider>();
+		HoTSlider = HoTBar.GetComponent<UISlider>();
+		PowerLabel = PowerBar.transform.FindChild("Label").gameObject.GetComponent<UILabel>();
+		HpLabel = HpBar.transform.FindChild("Label").gameObject.GetComponent<UILabel>();
+		HoTLabel = HoTBar.transform.FindChild("Label").gameObject.GetComponent<UILabel>();
+		Display();
+	}
+
+	public void Display()
+	{
+		PowerSlider.value = (float)ult/maxUlt;
+		HpSlider.value = (float)hp/maxhp;
+		HoTSlider.value = (float)cap/maxCap;
+		PowerLabel.text = ult + "/" + maxUlt;
+		HpLabel.text = hp + "/" + maxhp;
+		HoTLabel.text = cap + "/" + maxCap;
 	}
 
 	public void PutInMonster()
@@ -193,8 +227,9 @@ public class GemHolder : MonoBehaviour {
 	{
 		charfinish++;
 		if (charfinish == characterList.Count) {
-			Invoke ("NextAction" , 1);
-			DestroyMarkedTile();
+			DestroyMarkedTile(false);
+			Invoke ("NextAction" , 2);
+
 		}
 	}
 
@@ -214,20 +249,21 @@ public class GemHolder : MonoBehaviour {
 		}
 
 		//Destroy all the mark and subtitutes with a new one.
-		DestroyMarkedTile();
+		DestroyMarkedTile(true);
 
 
 
-		Invoke ("NextAction", 1);
+		Invoke ("NextAction", 2);
 	}
 
-	public void DestroyMarkedTile()
+	public void DestroyMarkedTile(bool t)
 	{
 		for(int y=5;y<GridHeight+5;y++)
 		{
 			for(int x=5;x<GridWidth+5;x++)
 			{
-				gems[x,y].SendMessage("DestroyMarked");
+				if(gems[x,y]!=null)
+				gems[x,y].SendMessage("DestroyMarked",t);
 				
 			}
 		}
@@ -310,14 +346,31 @@ public class GemHolder : MonoBehaviour {
 
 
 		Debug.Log ("NewTurn");
-
+		if(cap_active)
+		{
+			if(turnCount != cap_turn)
+			{
+				cap_active = false;
+				cap =0;
+			}
+		}
+		if(ult_active)
+		{
+			if(turnCount != ult_turn)
+			{
+				ult = 0;
+				ult_active = false;
+			}
+		}
+		turnCount++;
+		Display();
 		//Ready all gems
 		//ReadyForNewTurn();
 
 		//Recreate all lost gems
 		Replenished();
 
-
+		
 
 		//Create new gems
 
@@ -355,6 +408,8 @@ public class GemHolder : MonoBehaviour {
 	/// <param name="gem">Gem.</param>
 	void Check(GameObject gem)
 	{
+		if(gem == null)
+			return;
 		//Check if this gem is already marked
 		if (gem.GetComponent<Gem> ().isMarked ()) {
 			return;
@@ -447,11 +502,12 @@ public class GemHolder : MonoBehaviour {
 		//if it's already in the list then there is no need to continue
 
 
-		while (x-1 >= 5) {
+		while (gems[x-1,y]!=null) {
 			if(bigList.Contains(gems[x-1,y]))
 			{
 				break;
 			}
+
 
 			if(gems[x-1,y].transform.CompareTag(gem.transform.tag))
 			{
@@ -501,7 +557,7 @@ public class GemHolder : MonoBehaviour {
 			}
 		}
 		//get down side
-		while (y-1 >= 5) {
+		while (gems[x,y-1]!=null) {
 			if(bigList.Contains(gems[x,y-1]))
 			{
 				break;
@@ -528,4 +584,47 @@ public class GemHolder : MonoBehaviour {
 		}
 	}
 
+
+	public void ApplyDamage(int damage)
+	{
+		hp = hp-damage;
+		Display();
+	}
+
+	public void AddHeart(int h)
+	{
+		cap = cap + h;
+
+		if(cap_active == true)
+		{
+			cap = maxCap;
+		}
+		else if(cap >= maxCap && cap_active == false)
+		{
+			cap = maxCap;
+			cap_turn = turnCount;
+			cap_active = true;
+			//Do Capture
+		}
+		Display();
+	}
+
+	public void AddCombo(int c)
+	{
+		ult = ult +c;
+		Debug.Log (ult_active);
+		if(ult_active == true)
+		{
+			ult = maxUlt;
+		}
+		else if(ult >= maxUlt && ult_active == false)
+		{
+			ult = maxUlt;
+			ult_turn = turnCount;
+			ult_active = true;
+			Debug.Log ("Active ult");
+			//Do Ult
+		}
+		Display();
+	}
 }

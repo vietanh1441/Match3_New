@@ -10,7 +10,7 @@ public class Monster : MonoBehaviour {
 	public HUDText hd;
 	public UISlider hpSlider;
 	public Vector2[] hitPos = new Vector2[5];
-	public Transform hpBar;
+	//public Transform hpBar;
 	public int turnCount = 0;
 	private GameObject gemHolder_obj;
 	private GemHolder gemHolder_scr;
@@ -53,9 +53,9 @@ public class Monster : MonoBehaviour {
 		hpSlider = g.GetComponent<UISlider>();
 		GameObject h = NGUITools.AddChild(GameObject.Find ("UI Root"), hud_obj);
 		hd = h.GetComponent<HUDText>();
-		h.SendMessage("FollowTarget",  transform.FindChild("DamageHUD"));
+		h.SendMessage("FollowTarget",  transform);
 		g.transform.localScale = hpBarScale;
-		g.SendMessage("FollowTarget",hpBar);
+		g.SendMessage("FollowTarget",transform);
 		DisplayHpBar();
 	}
 
@@ -172,10 +172,22 @@ public class Monster : MonoBehaviour {
 	void ApplyDamage(int damage)
 	{
 		Debug.Log ("Damage Applied");
+		if(gemHolder_scr.ult_active)
+		{
+			damage = damage*2;
+		}
+		if(gemHolder_scr.cap_active)
+		{
+			damage = damage*0.3f;
+		}
 		hp = hp - damage;
 		hd.Add (-damage, Color.red, 3);
 			if(hp <= 0)
 		{
+			if(gemHolder_scr.cap_active)
+			{
+				//Add a new char;
+			}
 			Destroy(gameObject);
 		}
 

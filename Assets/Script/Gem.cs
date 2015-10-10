@@ -262,17 +262,32 @@ public class Gem : MonoBehaviour {
 		return marked;
 	}
 
-	public void DestroyMarked()
+	public void DestroyMarked(bool t)
 	{
 		//Error checking make sure that the character does not get killed in matching
 		if (isChar)
 			return;
 
 		if (marked) {
-
+			if(t)
+			{
+				if(transform.CompareTag("Heart"))
+				{
+					gemHolder_scr.AddHeart(1);
+				}
+				else if(transform.CompareTag("Dark"))
+				{
+					//Do Nothing
+				}
+				else
+				{
+					gemHolder_scr.AddCombo(1);
+				}
+			}
 
 			//Destroy(gameObject);
 			StartCoroutine("MatchAnimation");
+
 		}
 	}
 
@@ -293,6 +308,24 @@ public class Gem : MonoBehaviour {
 		Destroy (gameObject);
 	}
 
+	IEnumerator DamageAnimation()
+	{
+		detonate = true;
+		if(transform.CompareTag("Dark"))
+		{
+			DealDamage(XCoord,YCoord+1);
+			DealDamage(XCoord,YCoord-1);
+			DealDamage(XCoord+1,YCoord);
+			DealDamage(XCoord-1,YCoord);
+			
+		}
+		transform.localScale = new Vector3(0.5f,0.5f,0.5f);
+		yield return new WaitForSeconds (1f);
+		//gemHolder_scr.CreateNewGem(XCoord, YCoord);
+		Destroy (gameObject);
+	}
+
+
 	void DealDamage(int x,int y)
 	{
 		if(gemHolder_scr.gems[x,y] != null)
@@ -309,9 +342,9 @@ public class Gem : MonoBehaviour {
 			gameObject.GetComponent<Character> ().ApplyDamage (damage);
 		} else {
 			if (transform.tag == "Heart") {
-				gemHolder_scr.hp--;
+				gemHolder_scr.ApplyDamage(1);
 				//Lose level hp
-				StartCoroutine("MatchAnimation");
+				StartCoroutine("DamageAnimation");
 			}
 			else
 			{
@@ -321,7 +354,7 @@ public class Gem : MonoBehaviour {
 				}
 				else
 				{
-				StartCoroutine("MatchAnimation");
+				StartCoroutine("DamageAnimation");
 				}
 			}
 		}

@@ -21,7 +21,7 @@ public class Character : MonoBehaviour {
 	public GameObject hud_obj;
 	public HUDText hd;
 	public UISlider hpSlider;
-	public Transform hpBar, damageHUD;
+	//public Transform hpBar, damageHUD;
 	public Vector2[] hitPos = new Vector2[5];
 	private GameObject gemHolder_obj;
 	private GemHolder gemHolder_scr;
@@ -58,9 +58,9 @@ public class Character : MonoBehaviour {
 		hpSlider = g.GetComponent<UISlider>();
 		GameObject h = NGUITools.AddChild(GameObject.Find ("UI Root"), hud_obj);
 		hd = h.GetComponent<HUDText>();
-		h.SendMessage("FollowTarget",  damageHUD);
+		h.SendMessage("FollowTarget",  transform);
 		g.transform.localScale = hpBarScale;
-		g.SendMessage("FollowTarget",hpBar);
+		g.SendMessage("FollowTarget",transform);
 		DisplayHpBar();
 
 	}
@@ -165,6 +165,11 @@ public class Character : MonoBehaviour {
 					break;
 				}
 			}
+			else
+			{
+				up = false;
+				break;
+			}
 		}
 
 		v = skillSet.LoopUpVector(skill, type);
@@ -185,6 +190,11 @@ public class Character : MonoBehaviour {
 					break;
 				}
 			}
+			else
+			{
+				down = false;
+				break;
+			}
 		}
 		v = skillSet.LoopUpVector(skill, type);
 		for(int i = 0; i < v.Length; i++)
@@ -203,6 +213,11 @@ public class Character : MonoBehaviour {
 					right = false;
 					break;
 				}
+			}
+			else
+			{
+				right = false;
+				break;
 			}
 		}
 		v = skillSet.LoopUpVector(skill, type);
@@ -223,6 +238,11 @@ public class Character : MonoBehaviour {
 					left = false;
 					break;
 				}
+			}
+			else
+			{
+				left = false;
+				break;
 			}
 		}
 		Debug.Log (up);

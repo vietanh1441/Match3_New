@@ -11,6 +11,8 @@ using UnityEngine;
 
 public class UIFollowTarget : MonoBehaviour
 {
+	public float offset;
+
 	public delegate void OnVisibilityChange (bool isVisible);
 
 	/// <summary>
@@ -91,7 +93,7 @@ public class UIFollowTarget : MonoBehaviour
 	{
 		if (target && uiCamera != null)
 		{
-			Vector3 pos = gameCamera.WorldToViewportPoint(target.position);
+			Vector3 pos = gameCamera.WorldToViewportPoint(target.position + new Vector3(0,offset,0));
 
 			// Determine the visibility and the target alpha
 			int isVisible = (gameCamera.orthographic || pos.z > 0f) && (pos.x > 0f && pos.x < 1f && pos.y > 0f && pos.y < 1f) ? 1 : 0;
