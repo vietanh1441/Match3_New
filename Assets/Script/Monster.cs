@@ -38,10 +38,10 @@ public class Monster : MonoBehaviour {
 		hp = maxHp;
 		InitUI();
 		//InitHudText();
-		gemHolder_obj = GameObject.Find ("GemHolder");
+		gemHolder_obj = GameObject.FindGameObjectWithTag ("GemHolder");
 		gemHolder_scr = gemHolder_obj.GetComponent<GemHolder> ();
 		transform.parent = gemHolder_obj.transform;
-		gemHolder_scr.monsterList.Add (gameObject);
+		//gemHolder_scr.monsterList.Add (gameObject);
 		hd.Add("testing", Color.white, 2);
 	}
 	
@@ -174,11 +174,11 @@ public class Monster : MonoBehaviour {
 		Debug.Log ("Damage Applied");
 		if(gemHolder_scr.ult_active)
 		{
-			damage = damage*2;
+			damage = (int)damage*2;
 		}
 		if(gemHolder_scr.cap_active)
 		{
-			damage = damage*0.3f;
+			damage = (int)(damage*0.3f);
 		}
 		hp = hp - damage;
 		hd.Add (-damage, Color.red, 3);
@@ -197,6 +197,7 @@ public class Monster : MonoBehaviour {
 	void OnDestroy()
 	{
 		gemHolder_scr.monsterList.Remove(gameObject);
+		gemHolder_scr.CheckGameStatus();
 	}
 
 	void DisplayHpBar()

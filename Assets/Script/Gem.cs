@@ -11,12 +11,14 @@ public class Gem : MonoBehaviour {
 	bool release = true;
 	bool ready = false;
 	bool detonate = false;
+	bool battleMarked = false;
 	public GameObject timer;
+	public GameObject damager;
 
 	//if gems is a character
 	public bool isChar;
 
-
+	bool match = false;
 
 
 	//Set up for click and drag
@@ -97,7 +99,7 @@ public class Gem : MonoBehaviour {
 		hpSlider = timer.GetComponent<UISlider>();
 			transform.localScale = new Vector3(0.9f,0.9f,0.9f);
 
-		gemHolder_obj = GameObject.Find ("GemHolder");
+		gemHolder_obj = GameObject.FindGameObjectWithTag ("GemHolder");
 		gemHolder_scr = gemHolder_obj.GetComponent<GemHolder> ();
 		spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
 		CreateGem();
@@ -105,7 +107,16 @@ public class Gem : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
+		if(match)
+		{
+			transform.position = Vector3.MoveTowards(transform.position, new Vector3(0,0,0), 10*Time.deltaTime);
+			if(Vector3.Distance(transform.position, new Vector3(0,0,0)) < 0.1f)
+		    {
+				match = false;
+				gemHolder_scr.GemSignal();
+				Destroy(gameObject);
+			}
+		}
 	}
 
 	public void CreateGem()
@@ -116,7 +127,7 @@ public class Gem : MonoBehaviour {
 		} else {
 			Init_color ();
 		}
-		transform.parent = GameObject.Find ("GemHolder").transform;
+		transform.parent = GameObject.FindGameObjectWithTag ("GemHolder").transform;
 		curX = XCoord;
 		curY = YCoord;
 	}
@@ -253,6 +264,10 @@ public class Gem : MonoBehaviour {
 	/// <param name="value">the length of the match, e.g. match 3 or 4</param>
 	void Mark(int val)
 	{
+		if(val == 1)
+		{
+			battleMarked = true;
+		}
 		marked = true;
 		value = val;
 	}
@@ -286,12 +301,26 @@ public class Gem : MonoBehaviour {
 			}
 
 			//Destroy(gameObject);
-			StartCoroutine("MatchAnimation");
+			if(battleMarked)
+			{
+				MatchAnimation(2);
+			}
+			else
+			{
+				MatchAnimation(0);
+			}
 
 		}
 	}
 
-	IEnumerator MatchAnimation()
+	/// <summary>
+	/// Make animations as the gems get destroyed. Based on type, do different animation
+	/// 0: just go to wherever;
+	/// 1: break animation
+	/// 2: Attack animation
+	/// </summary>
+	/// <param name="type">Type.</param>
+	void MatchAnimation(int dam)
 	{
 		detonate = true;
 		if(transform.CompareTag("Dark"))
@@ -303,12 +332,32 @@ public class Gem : MonoBehaviour {
 
 		}
 		transform.localScale = new Vector3(0.5f,0.5f,0.5f);
-		yield return new WaitForSeconds (1f);
+		if(dam== 0)
+		{
+			match = true;
+		}
+		else if(dam == 1)
+		{
+			//damage animation
+			Invoke("DoDestroy",1);
+		}
+		else if(dam == 2)
+		{
+			//Just burn
+			Invoke("DoDestroy",1);
+		}
+		//yield return new WaitForSeconds (1f);
 		//gemHolder_scr.CreateNewGem(XCoord, YCoord);
-		Destroy (gameObject);
+		//Destroy (gameObject);
 	}
 
-	IEnumerator DamageAnimation()
+	void DoDestroy()
+	{
+		gemHolder_scr.GemSignal();
+		Destroy(gameObject);
+	}
+
+/*	IEnumerator DamageAnimation()
 	{
 		detonate = true;
 		if(transform.CompareTag("Dark"))
@@ -324,14 +373,12 @@ public class Gem : MonoBehaviour {
 		//gemHolder_scr.CreateNewGem(XCoord, YCoord);
 		Destroy (gameObject);
 	}
-
+*/
 
 	void DealDamage(int x,int y)
 	{
-		if(gemHolder_scr.gems[x,y] != null)
-		{
-			gemHolder_scr.gems[x,y].SendMessage("ApplyDamage",1);
-		}
+		GameObject d = Instantiate(damager, new Vector3( x, y, transform.position.z), Quaternion.identity) as GameObject;
+		d.SendMessage("SetDamage",1);
 	}
 
 	public void ApplyDamage(int damage)
@@ -344,7 +391,8 @@ public class Gem : MonoBehaviour {
 			if (transform.tag == "Heart") {
 				gemHolder_scr.ApplyDamage(1);
 				//Lose level hp
-				StartCoroutine("DamageAnimation");
+				//StartCoroutine("DamageAnimation");
+				MatchAnimation(1);
 			}
 			else
 			{
@@ -354,7 +402,8 @@ public class Gem : MonoBehaviour {
 				}
 				else
 				{
-				StartCoroutine("DamageAnimation");
+				//StartCoroutine("DamageAnimation");
+					MatchAnimation(1);
 				}
 			}
 		}

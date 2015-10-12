@@ -45,7 +45,7 @@ public class Character : MonoBehaviour {
 		skillSet = GameObject.Find("SkillSet").GetComponent<SkillSet>();
 		hp = maxHp;
 		InitUI();
-		gemHolder_obj = GameObject.Find ("GemHolder");
+		gemHolder_obj = GameObject.FindGameObjectWithTag ("GemHolder");
 		gemHolder_scr = gemHolder_obj.GetComponent<GemHolder> ();
 	//	DisplayHpBar();
 	}
@@ -99,7 +99,7 @@ public class Character : MonoBehaviour {
 			SwordMan();
 		}
 
-		Invoke ("FinishAction", 1);
+		Invoke ("FinishAction", 2);
 	}
 
 	void Check()

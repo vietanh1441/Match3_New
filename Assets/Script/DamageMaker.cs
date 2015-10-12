@@ -55,6 +55,6 @@ public class DamageMaker : MonoBehaviour {
 			damage = 0;
 		}
 		gameObject.GetComponent<BoxCollider2D>().enabled = true;
-		Invoke("SelfDestruct", 3f);
+		Invoke("SelfDestruct", 0.2f);
 	}
 }

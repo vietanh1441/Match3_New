@@ -9,10 +9,12 @@ public class GemHolder : MonoBehaviour {
 	public int GridHeight = 5;
 	public GameObject gemPrefab;
 	public GameObject[] charPrefab;
+	public GameObject[] monsterPrefab;
 	public GameObject floorPrefab;
+	bool match_flag = false;
 	private int turnCount=0;
 	private int ult_turn, cap_turn;
-
+	private bool gem_ready = true;
 	public bool ult_active = false;
 	public bool cap_active = false;
 	//public int hp = 10;
@@ -34,6 +36,10 @@ public class GemHolder : MonoBehaviour {
 	UISlider PowerSlider, HpSlider, HoTSlider;
 	UILabel PowerLabel, HpLabel, HoTLabel;
 
+	//central
+	private GameObject central;
+	private Central central_scr;
+
 	//public int currentStatus;
 
 	void Start () 
@@ -54,14 +60,23 @@ public class GemHolder : MonoBehaviour {
 //				gems.Add(g.GetComponent<Gem>());
 			}
 		}
+		//caching central
+		central = GameObject.Find("Central");
+		central_scr = central.GetComponent<Central>();
 
 		PutInCharacter ();
+		PutInMonster();
 		Display();
+
+		central_scr.Ready();
 	//	PutInMonster ();
 	}
 
 	void InitUI()
 	{
+		PowerBar = GameObject.FindGameObjectWithTag ("Power");
+		HpBar= GameObject.FindGameObjectWithTag("HP");
+		HoTBar = GameObject.FindGameObjectWithTag("HoT");
 		PowerSlider = PowerBar.GetComponent<UISlider>();
 		HpSlider = HpBar.GetComponent<UISlider>();
 		HoTSlider = HoTBar.GetComponent<UISlider>();
@@ -83,17 +98,45 @@ public class GemHolder : MonoBehaviour {
 
 	public void PutInMonster()
 	{
-		for (int i = 0; i < charPrefab.Length; i++) {
-			int x = Random.Range (0,GridWidth);
-			int y = Random.Range(0,GridHeight);
+		for (int i = 0; i < monsterPrefab.Length; i++) {
+			Vector2 v = GenerateMonsterRandom(GridWidth, GridHeight);
+			int x = (int)v.x;
+			int y = (int)v.y;
+			//Destroy (gems[x,y]);
 			
-			Destroy (gems[x,y]);
-			
-			GameObject g = Instantiate (charPrefab[i], new Vector3 (x, y, 0), Quaternion.identity)as GameObject;
+			GameObject g = Instantiate (monsterPrefab[i], new Vector3 (x, y, 0), Quaternion.identity)as GameObject;
 			g.transform.parent = gameObject.transform;
 			gems [x, y] = g;
-			characterList.Add (g);
+			monsterList.Add (g);
 		}
+	}
+
+	static Vector2 GenerateMonsterRandom(int gw, int gh)
+	{
+		Vector2 v = new Vector2(0,0);
+
+		int a =Random.Range(0,4);
+		if(a == 0)
+		{
+			v.x = 4;
+			v.y = Random.Range (5,gh+5);
+		}
+		else if(a == 1)
+		{
+			v.x = gh+5;
+			v.y = Random.Range (5,gh+5);
+		}
+		else if(a == 2)
+		{
+			v.y = 4;
+			v.x = Random.Range (5,gh+5);
+		}
+		else if(a == 3)
+		{
+			v.y = gh+5;
+			v.x = Random.Range (5,gh+5);
+		}
+		return v;
 	}
 
 	//Put a character into the board;
@@ -138,6 +181,15 @@ public class GemHolder : MonoBehaviour {
 		gem2_scr.Register ();
 	}
 
+	public void GemSignal()
+	{
+		if(gem_ready == false)
+		{
+			gem_ready = true;
+			NextAction();
+		}
+	}
+
 	//The game "clock", dictacte what to do next;
 	public void NextAction()
 	{
@@ -153,6 +205,7 @@ public class GemHolder : MonoBehaviour {
 
 		}
 		else if( status == Status.CheckBoard) {
+			gem_ready = true;
 			status = Status.CheckMonster;
 			CheckMonster ();
 
@@ -168,7 +221,7 @@ public class GemHolder : MonoBehaviour {
 		}
 	}
 
-	void CheckGameStatus()
+	public void CheckGameStatus()
 	{
 		if(CheckWinning())
 		{
@@ -183,15 +236,18 @@ public class GemHolder : MonoBehaviour {
 	void Winning()
 	{
 		Debug.Log ("Winning");
+		central_scr.Win ();
 	}
 
-	void Losing()
+	public void Losing()
 	{
 		Debug.Log ("Losing");
+		central_scr.Lose ();
 	}
 
-	bool CheckWinning()
+	public bool CheckWinning()
 	{
+		Debug.Log(monsterList.Count);
 		if(monsterList.Count == 0)
 			return true;
 		return false;
@@ -201,8 +257,11 @@ public class GemHolder : MonoBehaviour {
 	{
 		if(characterList.Count == 0)
 			return true;
-		if(hp == 0)
+		if(hp <= 0)
+		{
+			Debug.Log("Hp = 0");
 			return true;
+		}
 		return false;
 	}
 
@@ -225,6 +284,7 @@ public class GemHolder : MonoBehaviour {
 
 	public void FinishChar()
 	{
+
 		charfinish++;
 		if (charfinish == characterList.Count) {
 			DestroyMarkedTile(false);
@@ -238,6 +298,8 @@ public class GemHolder : MonoBehaviour {
 	//Check for matches
 	public void CheckBoard()
 	{
+		gem_ready = false; 
+		match_flag = false;
 		Debug.Log ("CheckBoard");
 		//Check whole board for match, if it's indeed match, mark them
 		for(int y=5;y<GridHeight+5;y++)
@@ -249,11 +311,14 @@ public class GemHolder : MonoBehaviour {
 		}
 
 		//Destroy all the mark and subtitutes with a new one.
+		if(match_flag)
 		DestroyMarkedTile(true);
+		else
+			Invoke("NextAction",1);
 
 
 
-		Invoke ("NextAction", 2);
+		//Invoke ("NextAction", 2);
 	}
 
 	public void DestroyMarkedTile(bool t)
@@ -318,11 +383,14 @@ public class GemHolder : MonoBehaviour {
 	public void FinishMonster()
 	{
 		charfinish++;
-		if (charfinish == characterList.Count) {
+		if (charfinish == monsterList.Count) {
 			Invoke ("NextAction" , 1);
 		}
 	}
 
+	/// <summary>
+	/// Replenished all the destroyed gems
+	/// </summary>
 	public void Replenished()
 	{
 		for(int y=5;y<GridHeight+5;y++)
@@ -465,6 +533,7 @@ public class GemHolder : MonoBehaviour {
 			foreach ( GameObject g in list)
 			{
 				g.SendMessage("Mark", list.Count);
+				match_flag = true;
 			}
 		}
 
