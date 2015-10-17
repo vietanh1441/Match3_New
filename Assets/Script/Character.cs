@@ -1,10 +1,24 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Character : MonoBehaviour {
 
-	public int maxHp = 5;
-	public int hp, atk;
+	/// <summary>
+	/// what is needed to inilization of a character
+	/// A Prefab of model
+	/// maxHP, hp, skillset
+	/// central will instantiate and initialize the character and then give it to gemHolder
+	/// GemHolder will then put the transform inside the room
+	/// </summary>
+
+
+	public int max_hp = 5;
+	public int hp, dmg, def;
+	public List<int> charSkill = new List<int>();
+	public List<int> charLvl = new List<int>();
+	private GameObject central;
+	private Central central_scr;
 	//The type of character: 
 	/// <summary>
 	/// 1: swordman
@@ -15,6 +29,9 @@ public class Character : MonoBehaviour {
 	/// </summary>
 	public int type;
 	public SkillSet skillSet;
+
+	//list of available skill and list of level of skill
+
 	public GameObject damager;
 	private bool up = false, down= false, right=false, left=false;
 	public GameObject hpSlider_obj;
@@ -42,12 +59,50 @@ public class Character : MonoBehaviour {
 	}
 	// Use this for initialization
 	void Start () {
+
+		Sync();
+		//Get info from central
+
 		skillSet = GameObject.Find("SkillSet").GetComponent<SkillSet>();
-		hp = maxHp;
+		hp = max_hp;
 		InitUI();
 		gemHolder_obj = GameObject.FindGameObjectWithTag ("GemHolder");
 		gemHolder_scr = gemHolder_obj.GetComponent<GemHolder> ();
 	//	DisplayHpBar();
+	}
+
+	void Sync()
+	{
+		central = GameObject.Find("Central");
+		central_scr = central.GetComponent<Central>();
+		if(type == 1)
+		{
+			max_hp = central_scr.char1_maxHp;
+			dmg = central_scr.char1_dmg;
+			def = central_scr.char1_def;
+			foreach( int skill in central_scr.char1Skill)
+			{
+				charSkill.Add (skill);
+			}
+			foreach(int lvl in central_scr.char1Lvl)
+			{
+				charLvl.Add (lvl);
+			}
+		}
+		if(type == 2)
+		{
+			max_hp = central_scr.char2_maxHp;
+			dmg = central_scr.char2_dmg;
+			def = central_scr.char2_def;
+			foreach( int skill in central_scr.char2Skill)
+			{
+				charSkill.Add (skill);
+			}
+			foreach(int lvl in central_scr.char2Lvl)
+			{
+				charLvl.Add (lvl);
+			}
+		}
 	}
 
 	void InitUI()
@@ -73,6 +128,11 @@ public class Character : MonoBehaviour {
 
 	public void ApplyDamage(int damage)
 	{
+		damage = damage-def;
+		if(damage <= 1)
+		{
+			damage = 1;
+		}
 		hp = hp - damage;
 		hd.Add(-damage, Color.red, 3);
 		if (hp <= 0) {
@@ -88,24 +148,18 @@ public class Character : MonoBehaviour {
 
 	public void DoAction()
 	{
-		if(type == 0)
-		{
-			Check();
-		}
-
-		//Debug.Log ("Character Do Action");
-		if(type==1)
-		{
-			SwordMan();
-		}
-
+		Check();
 		Invoke ("FinishAction", 2);
 	}
 
 	void Check()
 	{
+		//Here there will be a list of all the skill number
+		//and for each skill, check it
+
+
 		//bool up, down, right, left
-		CheckSkill(0);
+		CheckSkill(2);
 	}
 
 	int SwordMan()
@@ -251,9 +305,14 @@ public class Character : MonoBehaviour {
 		Debug.Log (left);
 
 		//Mark tiles and deal damage
+		Vector2[] vs;
+		int damage = 0;
 		 v = skillSet.LoopUpVector(skill, type);
-		Vector2[] vs = skillSet.LookUpDamageTile(skill, type);
-		int damage = skillSet.LookUpDamage(skill, type , 1);
+		GameObject summon = skillSet.LookUpSummon(skill,type);
+		 vs = skillSet.LookUpDamageTile(skill, type);
+		 damage = skillSet.LookUpDamage(skill, type , 1, dmg);
+
+		//damage = damage + dmg;
 		GameObject a;
 		if(up)
 		{
@@ -276,13 +335,24 @@ public class Character : MonoBehaviour {
 				{
 					break;
 				}
+				if(summon == null)
+				{
 				HitTile(vs[i],damage);
+				}
+				else
+				{
+					GameObject smObj =	Instantiate(summon, new Vector3(transform.position.x + vs[i].x, transform.position.y+ + vs[i].y, transform.position.z),Quaternion.identity) as GameObject;
+					smObj.SendMessage("SetDamage",damage);
+					Destroy(gemHolder_scr.gems[(int)transform.position.x + (int)vs[i].x, (int)transform.position.y+ + (int)vs[i].y] );
+					gemHolder_scr.gems[(int)transform.position.x + (int)vs[i].x, (int)transform.position.y+ + (int)vs[i].y] = smObj;
+				}
 
 			}
 		}
 
 		v = skillSet.LoopUpVector(skill, type);
-		 vs = skillSet.LookUpDamageTile(skill, type);
+		vs = skillSet.LookUpDamageTile(skill, type);
+		damage = skillSet.LookUpDamage(skill, type , 1, dmg);
 		if(down)
 		{
 			for(int i = 0; i < v.Length; i++)
@@ -306,11 +376,22 @@ public class Character : MonoBehaviour {
 				{
 					break;
 				}
-				HitTile(vs[i],damage);
+				if(summon == null)
+				{
+					HitTile(vs[i],damage);
+				}
+				else
+				{
+					GameObject smObj =	Instantiate(summon, new Vector3(transform.position.x + vs[i].x, transform.position.y+ + vs[i].y, transform.position.z),Quaternion.identity)as GameObject;
+					smObj.SendMessage("SetDamage",damage);
+					Destroy(gemHolder_scr.gems[(int)transform.position.x + (int)vs[i].x, (int)transform.position.y+ + (int)vs[i].y] );
+					gemHolder_scr.gems[(int)transform.position.x + (int)vs[i].x, (int)transform.position.y+ + (int)vs[i].y] = smObj;
+				}
 			}
 		}
 		v = skillSet.LoopUpVector(skill, type);
 		vs = skillSet.LookUpDamageTile(skill, type);
+		damage = skillSet.LookUpDamage(skill, type , 1, dmg);
 		if(right)
 		{
 			for(int i = 0; i < v.Length; i++)
@@ -334,12 +415,23 @@ public class Character : MonoBehaviour {
 				{
 					break;
 				}
-				HitTile(vs[i],damage);
+				if(summon == null)
+				{
+					HitTile(vs[i],damage);
+				}
+				else
+				{
+					GameObject smObj =	Instantiate(summon, new Vector3(transform.position.x + vs[i].x, transform.position.y+ + vs[i].y, transform.position.z),Quaternion.identity)as GameObject;
+					smObj.SendMessage("SetDamage",damage);
+					Destroy(gemHolder_scr.gems[(int)transform.position.x + (int)vs[i].x, (int)transform.position.y+ + (int)vs[i].y] );
+					gemHolder_scr.gems[(int)transform.position.x + (int)vs[i].x, (int)transform.position.y+ + (int)vs[i].y] = smObj;
+				}
 			}
 		}
 
 		v = skillSet.LoopUpVector(skill, type);
 		vs = skillSet.LookUpDamageTile(skill, type);
+		damage = skillSet.LookUpDamage(skill, type , 1, dmg);
 		if(left)
 		{
 			for(int i = 0; i < v.Length; i++)
@@ -363,7 +455,17 @@ public class Character : MonoBehaviour {
 				{
 					break;
 				}
-				HitTile(vs[i],damage);
+				if(summon == null)
+				{
+					HitTile(vs[i],damage);
+				}
+				else
+				{
+					GameObject smObj =	Instantiate(summon, new Vector3(transform.position.x + vs[i].x, transform.position.y+ + vs[i].y, transform.position.z),Quaternion.identity)as GameObject;
+					smObj.SendMessage("SetDamage",damage);
+					Destroy(gemHolder_scr.gems[(int)transform.position.x + (int)vs[i].x, (int)transform.position.y+ + (int)vs[i].y] );
+					gemHolder_scr.gems[(int)transform.position.x + (int)vs[i].x, (int)transform.position.y+ + (int)vs[i].y] = smObj;
+				}
 			}
 		}
 		//return b;
@@ -496,7 +598,7 @@ public class Character : MonoBehaviour {
 	void HitTile(int x, int y)
 	{
 		GameObject d = Instantiate(damager, new Vector3(transform.position.x + x, transform.position.y + y, transform.position.z), Quaternion.identity) as GameObject;
-		d.SendMessage("SetDamage",atk);
+		d.SendMessage("SetDamage",dmg);
 	}
 
 	void HitTile(Vector2 v, int dam)
@@ -507,13 +609,13 @@ public class Character : MonoBehaviour {
 
 	void OnDestroy()
 	{
-		gemHolder_scr.characterList.Remove(gameObject);
+		//gemHolder_scr.characterList.Remove(gameObject);
 	}
 
 	void DisplayHpBar()
 	{
-		Debug.Log (hp/maxHp);
-		hpSlider.value = (float)hp/maxHp;
+		Debug.Log (hp/max_hp);
+		hpSlider.value = (float)hp/max_hp;
 	}
 
 	static Vector2 Downize(Vector2 pos)

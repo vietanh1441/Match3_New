@@ -48,6 +48,7 @@
   <ItemGroup>
      <Compile Include="Assets\Central.cs" />
      <Compile Include="Assets\DamageTooltip.cs" />
+     <Compile Include="Assets\Door.cs" />
      <Compile Include="Assets\Floor.cs" />
      <Compile Include="Assets\HUD Text\Examples\Scripts\ChatManager.cs" />
      <Compile Include="Assets\HUD Text\Examples\Scripts\ChatParticipant.cs" />
@@ -59,6 +60,7 @@
      <Compile Include="Assets\HUD Text\Examples\Scripts\Rotate.cs" />
      <Compile Include="Assets\HUD Text\Scripts\HUDText.cs" />
      <Compile Include="Assets\HUD Text\Scripts\UIFollowTarget.cs" />
+     <Compile Include="Assets\Leader.cs" />
      <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\Game\EquipItems.cs" />
      <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\Game\EquipRandomItem.cs" />
      <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\Game\UICursor.cs" />
@@ -197,6 +199,7 @@
      <Compile Include="Assets\NGUI\Scripts\UI\UITooltip.cs" />
      <Compile Include="Assets\NGUI\Scripts\UI\UIViewport.cs" />
      <Compile Include="Assets\PlayScreen.cs" />
+     <Compile Include="Assets\Room.cs" />
      <Compile Include="Assets\Script\Character.cs" />
      <Compile Include="Assets\Script\DamageMaker.cs" />
      <Compile Include="Assets\Script\Gem.cs" />

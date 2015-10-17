@@ -25,7 +25,7 @@ public class DamageMaker : MonoBehaviour {
 		}
 		else if(enemy_only )
 		{
-			if( other.transform.CompareTag("Monster"))
+			if( other.transform.CompareTag("Monster") || other.transform.CompareTag ("Inside"))
 			other.gameObject.SendMessage ("ApplyDamage", damage);
 		}
 		else

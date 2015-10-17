@@ -5,11 +5,13 @@ using System.Collections.Generic;
 public class GemHolder : MonoBehaviour {
 	public GameObject[,] gems = new GameObject[15,15];
 	public GameObject[,] floors = new GameObject[15,15];
+	public List<Vector2> monsterPos = new List<Vector2>();
 	public int GridWidth = 5;
 	public int GridHeight = 5;
 	public GameObject gemPrefab;
+	public GameObject unreadyGemPrefab;
 	public GameObject[] charPrefab;
-	public GameObject[] monsterPrefab;
+	public List<GameObject> monsterPrefab = new List<GameObject>();
 	public GameObject floorPrefab;
 	bool match_flag = false;
 	private int turnCount=0;
@@ -98,16 +100,39 @@ public class GemHolder : MonoBehaviour {
 
 	public void PutInMonster()
 	{
-		for (int i = 0; i < monsterPrefab.Length; i++) {
+		int x,y;
+		monsterPos.Clear ();
+		monsterPrefab.Clear ();
+		foreach(GameObject g in central_scr.monsterPrefab)
+		{
+			monsterPrefab.Add (g);
+		}
+
+		for (int i = 0; i < monsterPrefab.Count; i++) {
+
+			if(monsterPrefab[i].transform.CompareTag ("Inside"))
+			{
+				do
+				{
+					x = Random.Range (5,GridWidth+5);
+					y = Random.Range(5,GridHeight+5);
+				}while(gems[x,y].transform.tag == "Char" || gems[x,y].transform.tag == "Inside");
+				Destroy (gems[x,y]);
+			}
+			else
+			{
+			do{
 			Vector2 v = GenerateMonsterRandom(GridWidth, GridHeight);
-			int x = (int)v.x;
-			int y = (int)v.y;
-			//Destroy (gems[x,y]);
+			x = (int)v.x;
+			y = (int)v.y;
+			}while(monsterPos.Contains (new Vector2(x,y)));
 			
+			}
 			GameObject g = Instantiate (monsterPrefab[i], new Vector3 (x, y, 0), Quaternion.identity)as GameObject;
 			g.transform.parent = gameObject.transform;
 			gems [x, y] = g;
 			monsterList.Add (g);
+			monsterPos.Add (new Vector2(x,y));
 		}
 	}
 
@@ -123,18 +148,18 @@ public class GemHolder : MonoBehaviour {
 		}
 		else if(a == 1)
 		{
-			v.x = gh+5;
+			v.x = gw+5;
 			v.y = Random.Range (5,gh+5);
 		}
 		else if(a == 2)
 		{
 			v.y = 4;
-			v.x = Random.Range (5,gh+5);
+			v.x = Random.Range (5,gw+5);
 		}
 		else if(a == 3)
 		{
 			v.y = gh+5;
-			v.x = Random.Range (5,gh+5);
+			v.x = Random.Range (5,gw+5);
 		}
 		return v;
 	}
@@ -142,10 +167,14 @@ public class GemHolder : MonoBehaviour {
 	//Put a character into the board;
 	public void PutInCharacter()
 	{
+		int x,y;
 		for (int i = 0; i < charPrefab.Length; i++) {
-			int x = Random.Range (5,GridWidth+5);
-			int y = Random.Range(5,GridHeight+5);
-
+			do
+			{
+			 x = Random.Range (5,GridWidth+5);
+			 y = Random.Range(5,GridHeight+5);
+			}while(gems[x,y].transform.tag == "Char" || gems[x,y].transform.tag == "Inside");
+			
 			Destroy (gems[x,y]);
 
 			GameObject g = Instantiate (charPrefab[i], new Vector3 (x, y, 0), Quaternion.identity)as GameObject;
@@ -167,6 +196,8 @@ public class GemHolder : MonoBehaviour {
 	/// <param name="gem use to swap">Gem2.</param>
 	public void SwapGem(GameObject gem1, GameObject gem2)
 	{
+		if(gem2!= null)
+		{
 		int x, y;
 		Gem gem2_scr = gem2.GetComponent<Gem> ();
 		x = gem2_scr.XCoord;
@@ -179,6 +210,16 @@ public class GemHolder : MonoBehaviour {
 		gem1.transform.localPosition = new Vector2 (x, y);
 		gem1_scr.Register ();
 		gem2_scr.Register ();
+		}
+
+	}
+
+	public void SwapGem(GameObject gem1, Vector2 loc)
+	{
+		gems[(int)loc.x,(int)loc.y] = gem1;
+
+		gem1.transform.localPosition = new Vector2(loc.x, loc.y);
+		gem1.SendMessage("Register");
 	}
 
 	public void GemSignal()
@@ -400,10 +441,17 @@ public class GemHolder : MonoBehaviour {
 				//gems[x,y].SendMessage("NewTurn");
 				if(gems[x,y] == null)
 				{
-					CreateNewGem(x,y);
+					CreateUnreadyGem(x,y);
 				}
 			}
 		}
+	}
+
+	public void CreateUnreadyGem(int x, int y)
+	{
+		GameObject g = Instantiate (unreadyGemPrefab, new Vector3 (x, y, 0), Quaternion.identity)as GameObject;
+		g.transform.parent = gameObject.transform;
+		gems [x, y] = g;
 	}
 
 	/// <summary>
@@ -433,7 +481,7 @@ public class GemHolder : MonoBehaviour {
 		turnCount++;
 		Display();
 		//Ready all gems
-		//ReadyForNewTurn();
+		ReadyForNewTurn();
 
 		//Recreate all lost gems
 		Replenished();
@@ -489,6 +537,15 @@ public class GemHolder : MonoBehaviour {
 			return;
 		}
 
+		if(gem.transform.tag == "Mine")
+		{
+			return;
+		}
+
+		if(gem.transform.tag == "Totem")
+		{
+			return;
+		}
 		List<GameObject> list = new List<GameObject>();
 		List<GameObject> tempList = new List<GameObject>();
 		list.Add (gem);

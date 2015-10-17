@@ -14,11 +14,16 @@ public class Gem : MonoBehaviour {
 	bool battleMarked = false;
 	public GameObject timer;
 	public GameObject damager;
+	public bool heart =false;
+	public bool isTotem;
+	public int totemLives=3;
 
 	//if gems is a character
 	public bool isChar;
-
+	public bool isSpecial;
+	public bool unready;
 	bool match = false;
+	public int damage = 0;
 
 
 	//Set up for click and drag
@@ -54,44 +59,22 @@ public class Gem : MonoBehaviour {
 		}
 	}
 
-	/*public void NewTurn()
+	public void NewTurn()
 	{
 
-		//Get the gem ready if it's not, change its tag to its appropriate color
-		if (!ready && !isChar) {
-			ready = true;
-			if (color == 0)
-			{
-				transform.tag = "Fire";
-
-			}
-			if (color == 1)
-			{
-				transform.tag = "Tree";
-				//spriteRenderer.color = Color.blue;
-			}
-			if (color == 2)
-			{
-				transform.tag = "Water";
-			//	spriteRenderer.color = Color.red;
-			}
-			if (color == 3)
-			{
-				transform.tag = "Heart";
-				//spriteRenderer.color = Color.green;
-			}
-			if(color== 4)
-			{
-				transform.tag = "Dark";
-				//spriteRenderer.color = Color.gray;
-			}
-			spriteRenderer.sprite = color_sprite[color];
-			transform.localScale = new Vector3(0.9f,0.9f,0.9f);
-			//Debug.Log ("Ready");
+		if(unready)
+		{
+			CreateGem();
 		}
-
-
-	}*/
+		if(isTotem)
+		{
+			DealDamage(XCoord,YCoord+1);
+			DealDamage(XCoord,YCoord-1);
+			DealDamage(XCoord+1,YCoord);
+			DealDamage(XCoord-1,YCoord);
+			totemLives--;
+		}
+	}
 
 	void Start () 
 	{
@@ -102,9 +85,26 @@ public class Gem : MonoBehaviour {
 		gemHolder_obj = GameObject.FindGameObjectWithTag ("GemHolder");
 		gemHolder_scr = gemHolder_obj.GetComponent<GemHolder> ();
 		spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
-		CreateGem();
+		if(!isSpecial && !unready )
+		{
+			CreateGem();
+		}
+		else
+		{
+			transform.parent = GameObject.FindGameObjectWithTag ("GemHolder").transform;
+			curX = XCoord;
+			curY = YCoord;
+		}
+
+		if(unready)
+		{
+			transform.tag = "Unready";
+		}
+
 	}
-	
+
+
+
 	// Update is called once per frame
 	void Update () {
 		if(match)
@@ -123,13 +123,15 @@ public class Gem : MonoBehaviour {
 	{
 		int color = Random.Range (0, 5);
 		if (isChar) {
-			transform.tag = "Char";
+			//transform.tag = "Char";
 		} else {
 			Init_color ();
 		}
 		transform.parent = GameObject.FindGameObjectWithTag ("GemHolder").transform;
 		curX = XCoord;
 		curY = YCoord;
+		if(transform.tag == "Heart")
+			heart =true;
 	}
 
 	/// <summary>
@@ -171,7 +173,7 @@ public class Gem : MonoBehaviour {
 
 	void OnMouseDown()
 	{
-		if (isChar)
+		if (isChar || unready)
 			return;
 
 	//	Debug.Log ("CheckStatus");
@@ -190,7 +192,7 @@ public class Gem : MonoBehaviour {
 	void OnMouseDrag()
 	{
 		//Debug.Log ((int)gemHolder_scr.status);
-		if (isChar)
+		if (isChar || unready)
 			return;
 		if (release == false &&(int)gemHolder_scr.status == 0 ) {
 			hpSlider.value = hpSlider.value-Time.deltaTime/5; 
@@ -209,9 +211,16 @@ public class Gem : MonoBehaviour {
 			transform.position = curPosition;
 			//Debug.Log (XCoord);
 			//Debug.Log (curX);
-			if ((XCoord != curX || YCoord != curY) && gemHolder_scr.gems [XCoord, YCoord] != null) {
-
-				gemHolder_scr.SwapGem (gameObject, gemHolder_scr.gems [XCoord, YCoord]);
+			if ((XCoord != curX || YCoord != curY))
+			{
+				if( gemHolder_scr.gems [XCoord, YCoord] != null)
+				{
+					gemHolder_scr.SwapGem (gameObject, gemHolder_scr.gems [XCoord, YCoord]);
+				}
+				else
+				{
+					gemHolder_scr.SwapGem (gameObject, new Vector2(XCoord,YCoord));
+				}
 			}
 		}
 	}
@@ -236,7 +245,7 @@ public class Gem : MonoBehaviour {
 
 	void OnMouseUp()
 	{
-		if (isChar)
+		if (isChar && unready)
 			return;
 		if (release == false &&(int)gemHolder_scr.status == 0 ) {
 			Release ();
@@ -260,10 +269,12 @@ public class Gem : MonoBehaviour {
 
 	/// <summary>
 	/// Mark the specified value.
+	/// if mark is 1 that's meant vattle marked.
 	/// </summary>
 	/// <param name="value">the length of the match, e.g. match 3 or 4</param>
 	void Mark(int val)
 	{
+
 		if(val == 1)
 		{
 			battleMarked = true;
@@ -280,7 +291,7 @@ public class Gem : MonoBehaviour {
 	public void DestroyMarked(bool t)
 	{
 		//Error checking make sure that the character does not get killed in matching
-		if (isChar)
+		if (isChar&&unready)
 			return;
 
 		if (marked) {
@@ -290,7 +301,7 @@ public class Gem : MonoBehaviour {
 				{
 					gemHolder_scr.AddHeart(1);
 				}
-				else if(transform.CompareTag("Dark"))
+				else if(transform.CompareTag("Dark") || transform.CompareTag("Mine"))
 				{
 					//Do Nothing
 				}
@@ -303,6 +314,7 @@ public class Gem : MonoBehaviour {
 			//Destroy(gameObject);
 			if(battleMarked)
 			{
+			
 				MatchAnimation(2);
 			}
 			else
@@ -323,7 +335,7 @@ public class Gem : MonoBehaviour {
 	void MatchAnimation(int dam)
 	{
 		detonate = true;
-		if(transform.CompareTag("Dark"))
+		if(transform.CompareTag("Dark") || transform.CompareTag ("Mine"))
 		{
 			DealDamage(XCoord,YCoord+1);
 			DealDamage(XCoord,YCoord-1);
@@ -343,6 +355,7 @@ public class Gem : MonoBehaviour {
 		}
 		else if(dam == 2)
 		{
+		
 			//Just burn
 			Invoke("DoDestroy",1);
 		}
@@ -378,18 +391,32 @@ public class Gem : MonoBehaviour {
 	void DealDamage(int x,int y)
 	{
 		GameObject d = Instantiate(damager, new Vector3( x, y, transform.position.z), Quaternion.identity) as GameObject;
+		if(transform.CompareTag("Dark"))
+		{
 		d.SendMessage("SetDamage",1);
+		}
+		if(transform.CompareTag("Mine"))
+		{
+			Debug.Log ("Hmm");
+			d.SendMessage("SetDamage", damage);
+		}
+	}
+
+	public void SetDamage(int d)
+	{
+		damage = d;
 	}
 
 	public void ApplyDamage(int damage)
 	{
 
 		//Debug.Log ("ApplyDamage");
-		if (isChar) {
+		if (isChar && transform.CompareTag("Char")) {
 			gameObject.GetComponent<Character> ().ApplyDamage (damage);
 		} else {
-			if (transform.tag == "Heart") {
+			if (heart) {
 				gemHolder_scr.ApplyDamage(1);
+				heart = false;
 				//Lose level hp
 				//StartCoroutine("DamageAnimation");
 				MatchAnimation(1);
