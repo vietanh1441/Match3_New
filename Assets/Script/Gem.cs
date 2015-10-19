@@ -65,6 +65,7 @@ public class Gem : MonoBehaviour {
 		if(unready)
 		{
 			CreateGem();
+			unready = false;
 		}
 		if(isTotem)
 		{
@@ -73,6 +74,10 @@ public class Gem : MonoBehaviour {
 			DealDamage(XCoord+1,YCoord);
 			DealDamage(XCoord-1,YCoord);
 			totemLives--;
+			if(totemLives == 0)
+			{
+				Destroy(gameObject);
+			}
 		}
 	}
 
@@ -397,7 +402,11 @@ public class Gem : MonoBehaviour {
 		}
 		if(transform.CompareTag("Mine"))
 		{
-			Debug.Log ("Hmm");
+			//Debug.Log ("Hmm");
+			d.SendMessage("SetDamage", damage);
+		}
+		if(transform.CompareTag("Totem"))
+		{
 			d.SendMessage("SetDamage", damage);
 		}
 	}
@@ -411,7 +420,8 @@ public class Gem : MonoBehaviour {
 	{
 
 		//Debug.Log ("ApplyDamage");
-		if (isChar && transform.CompareTag("Char")) {
+		if (isChar ) {
+			if(transform.CompareTag("Char"))
 			gameObject.GetComponent<Character> ().ApplyDamage (damage);
 		} else {
 			if (heart) {

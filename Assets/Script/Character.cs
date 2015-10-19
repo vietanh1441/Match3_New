@@ -17,8 +17,13 @@ public class Character : MonoBehaviour {
 	public int hp, dmg, def;
 	public List<int> charSkill = new List<int>();
 	public List<int> charLvl = new List<int>();
+	public List<int> charExp = new List<int>();
 	private GameObject central;
 	private Central central_scr;
+	public int atkBonus;
+	public int atkBonusTurn = 0;
+	public int defBonus;
+	public int defBonusTurn = 0;
 	//The type of character: 
 	/// <summary>
 	/// 1: swordman
@@ -88,6 +93,10 @@ public class Character : MonoBehaviour {
 			{
 				charLvl.Add (lvl);
 			}
+			foreach(int exp in central_scr.char1Exp)
+			{
+				charExp.Add (exp);
+			}
 		}
 		if(type == 2)
 		{
@@ -101,6 +110,10 @@ public class Character : MonoBehaviour {
 			foreach(int lvl in central_scr.char2Lvl)
 			{
 				charLvl.Add (lvl);
+			}
+			foreach(int exp in central_scr.char2Exp)
+			{
+				charExp.Add (exp);
 			}
 		}
 	}
@@ -128,7 +141,7 @@ public class Character : MonoBehaviour {
 
 	public void ApplyDamage(int damage)
 	{
-		damage = damage-def;
+		damage = damage-def - defBonus;
 		if(damage <= 1)
 		{
 			damage = 1;
@@ -149,7 +162,23 @@ public class Character : MonoBehaviour {
 	public void DoAction()
 	{
 		Check();
+		CheckBonus();
+
 		Invoke ("FinishAction", 2);
+	}
+
+	void CheckBonus()
+	{
+		atkBonusTurn --;
+		if(atkBonusTurn <=0)
+		{
+			atkBonus = 0;
+		}
+		defBonusTurn --;
+		if(defBonusTurn <=0)
+		{
+			defBonus = 0;
+		}
 	}
 
 	void Check()
@@ -159,7 +188,64 @@ public class Character : MonoBehaviour {
 
 
 		//bool up, down, right, left
-		CheckSkill(2);
+		for(int i =0; i < charSkill.Count; i++)
+		{
+			Debug.Log("CharSkill Count" + charSkill.Count + "Skill number" + i);
+			int temp = CheckSkill(charSkill[i]);
+			if(temp >0)
+			{
+				charExp[i]= charExp[i] + temp;
+				if(CheckPowerUp(charExp[i]) != charLvl[i] )
+				{
+					Debug.Log("Level Up");
+					LevelUp(i);
+				}
+			}
+	  	}
+		CheckForNewSkill(type);
+	}
+
+	void LevelUp(int i)
+	{
+		charLvl[i] = CheckPowerUp(charExp[i]);
+
+	}
+
+	void CheckForNewSkill(int type)
+	{
+		if(type == 1)
+		{
+			if(charLvl[charSkill.IndexOf(1)] >=2 )
+			{
+				charSkill.Add (5);
+				charLvl.Add (1);
+				charExp.Add (0);
+			}
+		}
+	}
+
+	int CheckPowerUp(int exp)
+	{
+		if(exp < 1)
+		{
+			return 1;
+		}
+		else if (exp < 25)
+		{
+			return 2;
+		}
+		else if (exp < 50)
+		{
+			return 3;
+		}
+		else if (exp < 100)
+		{
+			return 4;
+		}
+		else
+		{
+			return 5;
+		}
 	}
 
 	int SwordMan()
@@ -196,8 +282,9 @@ public class Character : MonoBehaviour {
 	//Check type 1 skill
 	//get the shape and the string
 	//Compare, if correct, mark all tiles and deal damage
-	void CheckSkill(int skill)
+	int CheckSkill(int skill)
 	{
+		int use = 0;
 		bool up = true,down=true,right=true,left=true;
 		//bool b = true;
 		Vector2[] v = skillSet.LoopUpVector(skill, type);
@@ -303,14 +390,14 @@ public class Character : MonoBehaviour {
 		Debug.Log (down);
 		Debug.Log (right);
 		Debug.Log (left);
-
+		
 		//Mark tiles and deal damage
 		Vector2[] vs;
 		int damage = 0;
 		 v = skillSet.LoopUpVector(skill, type);
 		GameObject summon = skillSet.LookUpSummon(skill,type);
 		 vs = skillSet.LookUpDamageTile(skill, type);
-		 damage = skillSet.LookUpDamage(skill, type , 1, dmg);
+		 damage = skillSet.LookUpDamage(skill, type , 1, dmg) + atkBonus;
 
 		//damage = damage + dmg;
 		GameObject a;
@@ -348,13 +435,25 @@ public class Character : MonoBehaviour {
 				}
 
 			}
+					use ++;
+			if(damage > 900)
+			{
+				atkBonus = damage - 900;
+				atkBonusTurn = 3;
+			}
+			if(damage > 1000)
+			{
+				defBonus = damage - 1000;
+			}
+
 		}
 
 		v = skillSet.LoopUpVector(skill, type);
 		vs = skillSet.LookUpDamageTile(skill, type);
-		damage = skillSet.LookUpDamage(skill, type , 1, dmg);
-		if(down)
+		damage = skillSet.LookUpDamage(skill, type , 1, dmg)+ atkBonus;
+		if(down && damage < 900)
 		{
+					use ++;
 			for(int i = 0; i < v.Length; i++)
 			{
 				v[i] = Downize(v[i]);
@@ -391,9 +490,10 @@ public class Character : MonoBehaviour {
 		}
 		v = skillSet.LoopUpVector(skill, type);
 		vs = skillSet.LookUpDamageTile(skill, type);
-		damage = skillSet.LookUpDamage(skill, type , 1, dmg);
-		if(right)
+		damage = skillSet.LookUpDamage(skill, type , 1, dmg)+ atkBonus;
+		if(right &&  damage < 900)
 		{
+			use++;
 			for(int i = 0; i < v.Length; i++)
 			{
 				v[i] = Rightize(v[i]);
@@ -431,9 +531,10 @@ public class Character : MonoBehaviour {
 
 		v = skillSet.LoopUpVector(skill, type);
 		vs = skillSet.LookUpDamageTile(skill, type);
-		damage = skillSet.LookUpDamage(skill, type , 1, dmg);
-		if(left)
+		damage = skillSet.LookUpDamage(skill, type , 1, dmg)+ atkBonus;
+		if(left&& damage < 900)
 		{
+			use++;
 			for(int i = 0; i < v.Length; i++)
 			{
 				v[i] = Leftize(v[i]);
@@ -468,6 +569,7 @@ public class Character : MonoBehaviour {
 				}
 			}
 		}
+		return use;
 		//return b;
 	}
 

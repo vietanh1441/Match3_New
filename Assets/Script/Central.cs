@@ -11,6 +11,8 @@ public class Central : MonoBehaviour {
 	public List<int> char1Lvl = new List<int>();
 	public List<int> char2Skill = new List<int>();
 	public List<int> char2Lvl = new List<int>();
+	public List<int> char1Exp = new List<int>();
+	public List<int> char2Exp = new List<int>();
 	public int char1_maxHp;
 	public int char2_maxHp;
 	public int char1_dmg;
@@ -26,7 +28,9 @@ public class Central : MonoBehaviour {
 			Destroy(gameObject);
 		}
 	}
-	
+
+
+
 	void GoInside(List<GameObject> l)
 	{
 		monsterPrefab.Clear ();

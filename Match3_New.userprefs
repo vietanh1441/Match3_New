@@ -2,23 +2,27 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Script\Character.cs">
     <Files>
-      <File FileName="Assets\Script\Gem.cs" Line="400" Column="22" />
-      <File FileName="Assets\Central.cs" Line="1" Column="1" />
+      <File FileName="Assets\Script\Character.cs" Line="204" Column="6" />
+      <File FileName="Assets\Script\GemHolder.cs" Line="22" Column="23" />
+      <File FileName="Assets\Script\Gem.cs" Line="270" Column="1" />
       <File FileName="Assets\Script\Monster.cs" Line="1" Column="1" />
       <File FileName="Assets\HUD Text\Scripts\UIFollowTarget.cs" Line="1" Column="1" />
-      <File FileName="Assets\Script\Character.cs" Line="434" Column="56" />
-      <File FileName="Assets\SkillSet.cs" Line="94" Column="4" />
-      <File FileName="Assets\Script\GemHolder.cs" Line="547" Column="11" />
-      <File FileName="Assets\Script\DamageMaker.cs" Line="28" Column="86" />
-      <File FileName="Assets\newButton.cs" Line="1" Column="1" />
-      <File FileName="Assets\PlayScreen.cs" Line="1" Column="1" />
-      <File FileName="Assets\Door.cs" Line="1" Column="1" />
-      <File FileName="Assets\Leader.cs" Line="1" Column="1" />
+      <File FileName="Assets\Script\DamageMaker.cs" Line="1" Column="1" />
       <File FileName="Assets\Room.cs" Line="1" Column="1" />
+      <File FileName="Assets\Script\Central.cs" Line="32" Column="2" />
+      <File FileName="Assets\Script\SkillSet.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="C:\Users\vietanh1441\Documents\GitHub\Match3_New\Assets\Script\Gem.cs" line="270" />
+      <Breakpoint file="C:\Users\vietanh1441\Documents\GitHub\Match3_New\Assets\Script\Character.cs" line="164" />
+      <Breakpoint file="C:\Users\vietanh1441\Documents\GitHub\Match3_New\Assets\Script\Character.cs" line="165" />
+      <Breakpoint file="C:\Users\vietanh1441\Documents\GitHub\Match3_New\Assets\Script\Character.cs" line="193" />
+      <Breakpoint file="C:\Users\vietanh1441\Documents\GitHub\Match3_New\Assets\Script\Character.cs" line="201" />
+      <Breakpoint file="C:\Users\vietanh1441\Documents\GitHub\Match3_New\Assets\Script\Character.cs" line="211" />
+      <Breakpoint file="C:\Users\vietanh1441\Documents\GitHub\Match3_New\Assets\Script\Character.cs" line="218" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>

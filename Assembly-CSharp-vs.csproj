@@ -46,10 +46,6 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Central.cs" />
-     <Compile Include="Assets\DamageTooltip.cs" />
-     <Compile Include="Assets\Door.cs" />
-     <Compile Include="Assets\Floor.cs" />
      <Compile Include="Assets\HUD Text\Examples\Scripts\ChatManager.cs" />
      <Compile Include="Assets\HUD Text\Examples\Scripts\ChatParticipant.cs" />
      <Compile Include="Assets\HUD Text\Examples\Scripts\ColliderDisplayText.cs" />
@@ -60,7 +56,6 @@
      <Compile Include="Assets\HUD Text\Examples\Scripts\Rotate.cs" />
      <Compile Include="Assets\HUD Text\Scripts\HUDText.cs" />
      <Compile Include="Assets\HUD Text\Scripts\UIFollowTarget.cs" />
-     <Compile Include="Assets\Leader.cs" />
      <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\Game\EquipItems.cs" />
      <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\Game\EquipRandomItem.cs" />
      <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\Game\UICursor.cs" />
@@ -198,15 +193,20 @@
      <Compile Include="Assets\NGUI\Scripts\UI\UITexture.cs" />
      <Compile Include="Assets\NGUI\Scripts\UI\UITooltip.cs" />
      <Compile Include="Assets\NGUI\Scripts\UI\UIViewport.cs" />
-     <Compile Include="Assets\PlayScreen.cs" />
      <Compile Include="Assets\Room.cs" />
+     <Compile Include="Assets\Script\Central.cs" />
      <Compile Include="Assets\Script\Character.cs" />
      <Compile Include="Assets\Script\DamageMaker.cs" />
+     <Compile Include="Assets\Script\DamageTooltip.cs" />
+     <Compile Include="Assets\Script\Door.cs" />
+     <Compile Include="Assets\Script\Floor.cs" />
      <Compile Include="Assets\Script\Gem.cs" />
      <Compile Include="Assets\Script\GemHolder.cs" />
+     <Compile Include="Assets\Script\Leader.cs" />
      <Compile Include="Assets\Script\Monster.cs" />
-     <Compile Include="Assets\SkillSet.cs" />
-     <Compile Include="Assets\newButton.cs" />
+     <Compile Include="Assets\Script\PlayScreen.cs" />
+     <Compile Include="Assets\Script\SkillSet.cs" />
+     <Compile Include="Assets\Script\newButton.cs" />
      <None Include="Assets\NGUI\Examples\Shaders\Unlit - Depth Cutout.shader" />
      <None Include="Assets\NGUI\ReadMe - 3.9.4.txt" />
      <None Include="Assets\NGUI\Resources\Shaders\Unlit - Transparent Masked 1.shader" />
