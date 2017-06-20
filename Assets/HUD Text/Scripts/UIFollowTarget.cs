@@ -1,6 +1,6 @@
 //--------------------------------------------
 //            NGUI: HUD Text
-// Copyright Â© 2012 Tasharen Entertainment
+// Copyright © 2012 Tasharen Entertainment
 //--------------------------------------------
 
 using UnityEngine;
@@ -11,8 +11,6 @@ using UnityEngine;
 
 public class UIFollowTarget : MonoBehaviour
 {
-	public float offset;
-
 	public delegate void OnVisibilityChange (bool isVisible);
 
 	/// <summary>
@@ -93,7 +91,7 @@ public class UIFollowTarget : MonoBehaviour
 	{
 		if (target && uiCamera != null)
 		{
-			Vector3 pos = gameCamera.WorldToViewportPoint(target.position + new Vector3(0,offset,0));
+			Vector3 pos = gameCamera.WorldToViewportPoint(target.position);
 
 			// Determine the visibility and the target alpha
 			int isVisible = (gameCamera.orthographic || pos.z > 0f) && (pos.x > 0f && pos.x < 1f && pos.y > 0f && pos.y < 1f) ? 1 : 0;
@@ -128,8 +126,8 @@ public class UIFollowTarget : MonoBehaviour
 		else Destroy(gameObject);
 	}
 
-	void FollowTarget(Transform t)
-	{
-		target = t;
-	}
+    void FollowTarget(Transform t)
+    {
+        target = t;
+    }
 }

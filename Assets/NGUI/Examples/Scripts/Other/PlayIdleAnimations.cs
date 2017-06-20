@@ -1,3 +1,8 @@
+//----------------------------------------------
+//            NGUI: Next-Gen UI kit
+// Copyright © 2011-2012 Tasharen Entertainment
+//----------------------------------------------
+
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -7,7 +12,7 @@ using System.Collections.Generic;
 /// break animations all begin with "idle" (ex: idleStretch, idleYawn, etc).
 /// The script will place the idle loop animation on layer 0, and breaks on layer 1.
 /// </summary>
-/*
+
 [AddComponentMenu("NGUI/Examples/Play Idle Animations")]
 public class PlayIdleAnimations : MonoBehaviour
 {
@@ -85,4 +90,4 @@ public class PlayIdleAnimations : MonoBehaviour
 			}
 		}
 	}
-}*/
+}

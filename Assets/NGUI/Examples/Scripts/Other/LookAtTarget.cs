@@ -6,7 +6,7 @@
 /// </summary>
 
 [AddComponentMenu("NGUI/Examples/Look At Target")]
-/*public class LookAtTarget : MonoBehaviour
+public class LookAtTarget : MonoBehaviour
 {
 	public int level = 0;
 	public Transform target;
@@ -33,4 +33,4 @@
 			}
 		}
 	}
-}*/
+}

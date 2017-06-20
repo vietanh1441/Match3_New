@@ -4,14 +4,16 @@ using System.Collections.Generic;
 
 public class Character : MonoBehaviour {
 
-	/// <summary>
-	/// what is needed to inilization of a character
-	/// A Prefab of model
-	/// maxHP, hp, skillset
-	/// central will instantiate and initialize the character and then give it to gemHolder
-	/// GemHolder will then put the transform inside the room
-	/// </summary>
+    /// <summary>
+    /// what is needed to inilization of a character
+    /// A Prefab of model
+    /// maxHP, hp, skillset
+    /// central will instantiate and initialize the character and then give it to gemHolder
+    /// GemHolder will then put the transform inside the room
+    /// </summary>
 
+    //order display
+    public GameObject order_prefab;
 
 	public int max_hp = 5;
 	public int hp, dmg, def;
@@ -62,9 +64,18 @@ public class Character : MonoBehaviour {
 			return Mathf.RoundToInt(transform.localPosition.y);
 		}
 	}
-	// Use this for initialization
-	void Start () {
 
+    //Mock Data for Order
+    private Order o = new Order(new int[4] { 0,0,0,0 });
+    //private Order p = new Order(new string[4] { "ItemA", "ItemA", "ItemA", "ItemA" });
+    //private Order q = new Order(new string[4] { "ItemA", "ItemA", "ItemA", "ItemA" });
+
+    private Order[] orders;
+
+
+    // Use this for initialization
+    void Start () {
+        orders = new Order[1] { o };
 		Sync();
 		//Get info from central
 
@@ -73,8 +84,19 @@ public class Character : MonoBehaviour {
 		InitUI();
 		gemHolder_obj = GameObject.FindGameObjectWithTag ("GemHolder");
 		gemHolder_scr = gemHolder_obj.GetComponent<GemHolder> ();
-	//	DisplayHpBar();
+        //	DisplayHpBar();
+        CreateOrder();
 	}
+
+    //Creating Order at the top so the player can follow it
+    //Start by randomly assign ingredient to 4 spot of order
+    //Then create an order object at according location and send an array of 4 numbers to it
+    //This create a sprite at the location of the orders
+    private void CreateOrder()
+    {
+        GameObject g = Instantiate(order_prefab, new Vector3(15, 15, 0), Quaternion.identity);
+        g.SendMessage("SetOrder", o);
+    }
 
 	void Sync()
 	{
@@ -126,7 +148,7 @@ public class Character : MonoBehaviour {
 		hpSlider = g.GetComponent<UISlider>();
 		GameObject h = NGUITools.AddChild(GameObject.Find ("UI Root"), hud_obj);
 		hd = h.GetComponent<HUDText>();
-		h.SendMessage("FollowTarget",  transform);
+		//h.SendMessage("FollowTarget",  transform);
 		g.transform.localScale = hpBarScale;
 		g.SendMessage("FollowTarget",transform);
 		DisplayHpBar();
@@ -161,11 +183,131 @@ public class Character : MonoBehaviour {
 
 	public void DoAction()
 	{
-		Check();
-		CheckBonus();
+        //Check();
+        bool b = false;
+        CheckSurrounding(ref b);
+        //CheckBonus();
+        
+        gemHolder_scr.FinishChar(b);
+    }
 
-		Invoke ("FinishAction", 2);
-	}
+    private void CheckSurrounding(ref bool b)
+    {
+        //if the cook is at the outside perimeter, automatically fail
+        if (XCoord == 5 || XCoord == 10 || YCoord == 10 || YCoord == 5)
+            return;
+
+        //Get the tag of each adjacent
+        //put it in an array
+        int[] cook_in = new int[5];
+        string[] tag = new string[5];
+        tag[0] = gemHolder_scr.gems[XCoord, YCoord + 1].tag;
+        tag[1] = gemHolder_scr.gems[XCoord, YCoord - 1].tag;
+        tag[2] = gemHolder_scr.gems[XCoord + 1, YCoord].tag;
+        tag[3] = gemHolder_scr.gems[XCoord - 1, YCoord].tag;
+        cook_in = ConvertRecipe(tag);
+
+
+
+        //Debug.Log(Compare(cook_in, ConvertRecipe(orders[0].GetOrder())));
+        
+        for (int j = 0; j < orders.Length; j++)
+        {
+            if(!b)
+            if (Compare(cook_in, ConvertRecipe(orders[j].GetOrder())))
+            {
+               b = CookFood(tag, j);
+            }
+        }
+        Debug.Log(tag[0]);
+        
+    }
+
+
+    //Cook the food, the int i is for the position of the food cooked
+    private bool CookFood(string[] t, int i)
+    {
+        Debug.Log("SHouting for COOK");
+        //Compare position
+         int score = GetPositionScore(t, i);
+        Debug.Log(score);
+
+        //Get Freshness Score
+
+
+        //Move Item
+        //First, send all 4 Mark Message
+        gemHolder_scr.gems[XCoord, YCoord + 1].SendMessage("Mark",4);
+        gemHolder_scr.gems[XCoord, YCoord - 1].SendMessage("Mark", 4);
+        gemHolder_scr.gems[XCoord+1, YCoord ].SendMessage("Mark", 4);
+        gemHolder_scr.gems[XCoord-1, YCoord ].SendMessage("Mark", 4);
+
+        //Then call GemHolder DestroyedMarked
+        //gemHolder_scr.DestroyMarkedTile(false);
+
+        return true;
+    }
+
+    private int GetPositionScore(string[] t, int i)
+    {
+        int sum = 0;
+        for(int j = 0; j <4; j++)
+        {
+            if(t[j] == orders[i].GetOrder()[j])
+            {
+                sum++;
+            }
+        }
+        return sum;
+    }
+
+    //Convert a system of tag into broken down ingredient needed
+    private int[] ConvertRecipe(string[] tag)
+    {
+        int[] cook_in = new int[5];
+        for (int i = 0; i < 4; i++)
+        {
+            if (tag[i] == "ItemA")
+            {
+                cook_in[0]++;
+            }
+            if (tag[i] == "ItemB")
+            {
+                cook_in[1]++;
+            }
+            if (tag[i] == "ItemC")
+            {
+                cook_in[2]++;
+            }
+            if (tag[i] == "ItemD")
+            {
+                cook_in[3]++;
+            }
+            if (tag[i] == "ItemE")
+            {
+                cook_in[4]++;
+            }
+
+            
+        }
+        return cook_in;
+    }
+
+    private bool Compare(int[] c_in, int[] c_out)
+    {
+        bool result = true;
+        if (c_in[0] < c_out[0])
+            return false;
+        if (c_in[1] < c_out[1])
+            return false;
+        if (c_in[2] < c_out[2])
+            return false;
+        if (c_in[3] < c_out[3])
+            return false;
+        if (c_in[4] < c_out[4])
+            return false;
+        return result;
+    }
 
 	void CheckBonus()
 	{
@@ -202,7 +344,7 @@ public class Character : MonoBehaviour {
 				}
 			}
 	  	}
-		CheckForNewSkill(type);
+		//CheckForNewSkill(type);
 	}
 
 	void LevelUp(int i)
@@ -694,7 +836,7 @@ public class Character : MonoBehaviour {
 
 	void FinishAction()
 	{
-		gemHolder_scr.FinishChar ();
+		
 	}
 
 	void HitTile(int x, int y)

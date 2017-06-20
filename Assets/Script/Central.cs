@@ -34,10 +34,10 @@ public class Central : MonoBehaviour {
 	void GoInside(List<GameObject> l)
 	{
 		monsterPrefab.Clear ();
-		foreach ( GameObject m in l)
+		/*foreach ( GameObject m in l)
 		{
 			monsterPrefab.Add (m);
-		}
+		}*/
 		Application.LoadLevel("test1");
 	}
 	

@@ -38,13 +38,18 @@ public class Gem : MonoBehaviour {
 	private bool marked = false;				
 	//value when matched
 	public int value;
+    public int spoil;
 
 	//Gem Holder cache
 	private GameObject gemHolder_obj;
 	private GemHolder gemHolder_scr;
 
-	//Currently Coordinate, get by its local position
-	public int XCoord
+    //The Status of the gems(food)
+    public enum Status { Fresh, Good, Okay, Bad, Rat };
+    private Status status;
+
+    //Currently Coordinate, get by its local position
+    public int XCoord
 	{
 		get
 		{
@@ -79,7 +84,56 @@ public class Gem : MonoBehaviour {
 				Destroy(gameObject);
 			}
 		}
+        else
+        {
+            ChangeStatus();
+        }
 	}
+
+    private void ChangeStatus()
+    {
+        if (status == Status.Fresh)
+        {
+            status = Status.Good;
+        }
+        else if (status == Status.Good)
+        {
+            status = Status.Okay;
+        }
+        else if (status == Status.Okay)
+        {
+            status = Status.Bad;
+        }
+        else if (status == Status.Bad)
+        {
+            status = Status.Rat;
+        }
+        ChangeStatusSprite();
+    }
+
+    private void ChangeStatusSprite()
+    {
+        if (status == Status.Fresh)
+        {
+            
+        }
+        if (status == Status.Good)
+        {
+
+        }
+        if (status == Status.Okay)
+        {
+
+        }
+        if (status == Status.Bad)
+        {
+
+        }
+        if (status == Status.Rat)
+        {
+
+        }
+    } 
 
 	void Start () 
 	{
@@ -149,27 +203,27 @@ public class Gem : MonoBehaviour {
 		color = Random.Range(0, color_num);
 		if (color == 0)
 		{
-			transform.tag = "Fire";
+			transform.tag = "ItemA";
 			//spriteRenderer.sprite  = color_sprite[color];
 		}
 		if (color == 1)
 		{
-			transform.tag = "Tree";
+			transform.tag = "ItemB";
 			//spriteRenderer.sprite  = color_sprite[color];
 		}
 		if (color == 2)
 		{
-			transform.tag = "Water";
+			transform.tag = "ItemC";
 			//spriteRenderer.sprite  = color_sprite[color];
 		}
 		if (color == 3)
 		{
-			transform.tag = "Heart";
+			transform.tag = "ItemD";
 			//spriteRenderer.sprite  = color_sprite[color];
 		}
 		if(color== 4)
 		{
-			transform.tag = "Dark";
+			transform.tag = "ItemE";
 			//spriteRenderer.sprite  = color_sprite[color];
 		}
 		spriteRenderer.sprite = color_sprite[color];
@@ -274,7 +328,7 @@ public class Gem : MonoBehaviour {
 
 	/// <summary>
 	/// Mark the specified value.
-	/// if mark is 1 that's meant vattle marked.
+	/// if mark is 1 that's meant battle marked.
 	/// </summary>
 	/// <param name="value">the length of the match, e.g. match 3 or 4</param>
 	void Mark(int val)
@@ -293,14 +347,14 @@ public class Gem : MonoBehaviour {
 		return marked;
 	}
 
-	public void DestroyMarked(bool t)
+	public void DestroyMarked()
 	{
 		//Error checking make sure that the character does not get killed in matching
 		if (isChar&&unready)
 			return;
 
 		if (marked) {
-			if(t)
+			/*if(t)
 			{
 				if(transform.CompareTag("Heart"))
 				{
@@ -314,7 +368,7 @@ public class Gem : MonoBehaviour {
 				{
 					gemHolder_scr.AddCombo(1);
 				}
-			}
+			}*/
 
 			//Destroy(gameObject);
 			if(battleMarked)
@@ -324,6 +378,7 @@ public class Gem : MonoBehaviour {
 			}
 			else
 			{
+                Debug.Log("MatchHere");
 				MatchAnimation(0);
 			}
 
@@ -340,14 +395,14 @@ public class Gem : MonoBehaviour {
 	void MatchAnimation(int dam)
 	{
 		detonate = true;
-		if(transform.CompareTag("Dark") || transform.CompareTag ("Mine"))
+		/*if(transform.CompareTag("Dark") || transform.CompareTag ("Mine"))
 		{
 			DealDamage(XCoord,YCoord+1);
 			DealDamage(XCoord,YCoord-1);
 			DealDamage(XCoord+1,YCoord);
 			DealDamage(XCoord-1,YCoord);
 
-		}
+		}*/
 		transform.localScale = new Vector3(0.5f,0.5f,0.5f);
 		if(dam== 0)
 		{

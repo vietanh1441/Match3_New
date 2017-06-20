@@ -44,6 +44,8 @@ public class GemHolder : MonoBehaviour {
 
 	//public int currentStatus;
 
+    
+
 	void Start () 
 	{
 
@@ -227,7 +229,7 @@ public class GemHolder : MonoBehaviour {
 		if(gem_ready == false)
 		{
 			gem_ready = true;
-			NextAction();
+            Invoke("NextAction", 0.3f);
 		}
 	}
 
@@ -239,7 +241,12 @@ public class GemHolder : MonoBehaviour {
 			status = Status.CheckChar;
 			CheckChar ();
 		}
-		else if(status == Status.CheckChar) {
+
+        //GemHolder will have a order list that list all the ingredient needed to cook stuff
+        //during check char turn, it will check the 4 adjacent tile if they match with any in
+        //the order list
+        //If it does, then complete the order and move on to check board
+        else if (status == Status.CheckChar) {
 			CheckGameStatus();
 			status = Status.CheckBoard;
 			CheckBoard();
@@ -277,13 +284,13 @@ public class GemHolder : MonoBehaviour {
 	void Winning()
 	{
 		Debug.Log ("Winning");
-		central_scr.Win ();
+		//central_scr.Win ();
 	}
 
 	public void Losing()
 	{
 		Debug.Log ("Losing");
-		central_scr.Lose ();
+		//central_scr.Lose ();
 	}
 
 	public bool CheckWinning()
@@ -319,19 +326,23 @@ public class GemHolder : MonoBehaviour {
 
 
 		//CheckBoard next
-	//	Invoke ("NextAction", 1);
+		//Invoke ("NextAction", 0.3f);
 
 	}
 
-	public void FinishChar()
+	public void FinishChar(bool b)
 	{
 
 		charfinish++;
-		if (charfinish == characterList.Count) {
-			DestroyMarkedTile(false);
-			Invoke ("NextAction" , 2);
-
-		}
+        if (b)
+        {
+            gem_ready = false;
+            DestroyMarkedTile(false);
+        }
+        else
+        {
+            Invoke("NextAction", 0.3f);
+        }
 	}
 
 
@@ -351,13 +362,19 @@ public class GemHolder : MonoBehaviour {
 			}
 		}
 
-		//Destroy all the mark and subtitutes with a new one.
-		if(match_flag)
-		DestroyMarkedTile(true);
-		else
-			Invoke("NextAction",1);
+        //Destroy all the mark and subtitutes with a new one.
+        if (match_flag)
+        {
+            DestroyMarkedTile(true);
+            Debug.Log("Destroy");
+        }
+        else
+        {
+            Invoke("NextAction", 0.3f);
+            Debug.Log("Jump");
+        }
 
-
+       // Invoke("NextAction", 0.3f);
 
 		//Invoke ("NextAction", 2);
 	}
@@ -368,9 +385,10 @@ public class GemHolder : MonoBehaviour {
 		{
 			for(int x=5;x<GridWidth+5;x++)
 			{
-				if(gems[x,y]!=null)
-				gems[x,y].SendMessage("DestroyMarked",t);
-				
+                if (gems[x, y] != null)
+                {
+                    gems[x, y].SendMessage("DestroyMarked", t);
+                }
 			}
 		}
 	}
@@ -409,7 +427,7 @@ public class GemHolder : MonoBehaviour {
 		//Do Character stuff
 		if(monsterList.Count == 0)
 		{
-			Invoke("NextAction", 1);
+			Invoke("NextAction", 0.3f);
 		}
 		else
 		{
@@ -425,7 +443,7 @@ public class GemHolder : MonoBehaviour {
 	{
 		charfinish++;
 		if (charfinish == monsterList.Count) {
-			Invoke ("NextAction" , 1);
+			Invoke ("NextAction" , 0.3f);
 		}
 	}
 
@@ -443,9 +461,14 @@ public class GemHolder : MonoBehaviour {
 				{
 					CreateUnreadyGem(x,y);
 				}
+                else
+                {
+                    Debug.Log(gems[x, y].tag +" " + x + " " +y);
+                }
 			}
 		}
-	}
+        Invoke("NextAction", 0.3f);
+    }
 
 	public void CreateUnreadyGem(int x, int y)
 	{
@@ -491,7 +514,7 @@ public class GemHolder : MonoBehaviour {
 		//Create new gems
 
 		//Allow moving again
-		Invoke ("NextAction", 1);
+		
 
 	}
 
@@ -738,7 +761,7 @@ public class GemHolder : MonoBehaviour {
 	public void AddCombo(int c)
 	{
 		ult = ult +c;
-		Debug.Log (ult_active);
+
 		if(ult_active == true)
 		{
 			ult = maxUlt;

@@ -79,7 +79,7 @@ public class Monster : MonoBehaviour {
 
 	void Attacking()
 	{
-		Vector2 pos;
+		/*Vector2 pos;
 	
 		for(int i = 0; i < hitPos.Length; i++)
 		{
@@ -95,12 +95,12 @@ public class Monster : MonoBehaviour {
 			if(left)
 				HitTile(Leftize(pos));
 		}
-		//HitTile (1,0);
+		//HitTile (1,0);*/
 	}
 
 	void Warning()
 	{
-		Vector2 pos;
+		/*Vector2 pos;
 		
 		for(int i = 0; i < hitPos.Length; i++)
 		{
@@ -116,7 +116,7 @@ public class Monster : MonoBehaviour {
 			if(left)
 				WarnTile(Leftize(pos));
 		}
-		//HitTile (1,0);
+		//HitTile (1,0);*/
 	}
 
 	static Vector2 Downize(Vector2 pos)
