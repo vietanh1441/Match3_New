@@ -14,7 +14,8 @@ public class Character : MonoBehaviour {
 
     //order display
     public GameObject order_prefab;
-
+    private int score = 0;
+    private int count = 0;
 	public int max_hp = 5;
 	public int hp, dmg, def;
 	public List<int> charSkill = new List<int>();
@@ -49,7 +50,9 @@ public class Character : MonoBehaviour {
 	public Vector2[] hitPos = new Vector2[5];
 	private GameObject gemHolder_obj;
 	private GemHolder gemHolder_scr;
+    private GameObject[] order_obj = new GameObject[3];
 	public Vector3 hpBarScale = new Vector3(1,1,1);
+    private int order_ff = -1;
 	public int XCoord
 	{
 		get
@@ -66,16 +69,16 @@ public class Character : MonoBehaviour {
 	}
 
     //Mock Data for Order
-    private Order o = new Order(new int[4] { 0,0,0,0 });
+    //private Order o = new Order(new int[4] { 0,0,0,0 });
     //private Order p = new Order(new string[4] { "ItemA", "ItemA", "ItemA", "ItemA" });
     //private Order q = new Order(new string[4] { "ItemA", "ItemA", "ItemA", "ItemA" });
 
-    private Order[] orders;
+    private Order[] orders = new Order[3];
 
 
     // Use this for initialization
     void Start () {
-        orders = new Order[1] { o };
+       // orders = new Order[1] { o };
 		Sync();
 		//Get info from central
 
@@ -94,8 +97,27 @@ public class Character : MonoBehaviour {
     //This create a sprite at the location of the orders
     private void CreateOrder()
     {
-        GameObject g = Instantiate(order_prefab, new Vector3(15, 15, 0), Quaternion.identity);
-        g.SendMessage("SetOrder", o);
+        
+        for (int i = 0; i < 3; i++)
+        {
+            orders[i] = GenerateOrder();
+            GameObject g = Instantiate(order_prefab, new Vector3(5+4*i, 13, 0), Quaternion.identity);
+            g.SendMessage("SetOrder", orders[i]);
+            order_obj[i] = g;
+        }
+    }
+
+    private Order GenerateOrder()
+    {
+        int i, j;
+        int[] ing = new int[4];
+        for (i = 0; i < 4; i++)
+        {
+            j = Random.Range(0, gemHolder_scr.max_element);
+            ing[i] = j;
+        }
+        Order o = new Order(ing);
+        return o;
     }
 
 	void Sync()
@@ -183,6 +205,9 @@ public class Character : MonoBehaviour {
 
 	public void DoAction()
 	{
+        count = 0;
+        score = 0;
+        order_ff = -1;
         //Check();
         bool b = false;
         CheckSurrounding(ref b);
@@ -191,12 +216,24 @@ public class Character : MonoBehaviour {
         gemHolder_scr.FinishChar(b);
     }
 
+    private bool CheckSurroundingForNull()
+    {
+        bool n = false;
+        if( gemHolder_scr.gems[XCoord, YCoord + 1 ] == null ||
+            gemHolder_scr.gems[XCoord, YCoord - 1 ] == null ||
+            gemHolder_scr.gems[XCoord + 1, YCoord ] == null ||
+            gemHolder_scr.gems[XCoord - 1, YCoord ] == null)
+        {
+            n = true;
+        }
+        return n;
+    }
+
     private void CheckSurrounding(ref bool b)
     {
         //if the cook is at the outside perimeter, automatically fail
-        if (XCoord == 5 || XCoord == 10 || YCoord == 10 || YCoord == 5)
+        if (CheckSurroundingForNull())
             return;
-
         //Get the tag of each adjacent
         //put it in an array
         int[] cook_in = new int[5];
@@ -229,23 +266,62 @@ public class Character : MonoBehaviour {
     {
         Debug.Log("SHouting for COOK");
         //Compare position
-         int score = GetPositionScore(t, i);
+         score = GetPositionScore(t, i);
         Debug.Log(score);
 
         //Get Freshness Score
-
-
+        score += GetFreshnessScore();
+        
+        
         //Move Item
         //First, send all 4 Mark Message
-        gemHolder_scr.gems[XCoord, YCoord + 1].SendMessage("Mark",4);
-        gemHolder_scr.gems[XCoord, YCoord - 1].SendMessage("Mark", 4);
-        gemHolder_scr.gems[XCoord+1, YCoord ].SendMessage("Mark", 4);
-        gemHolder_scr.gems[XCoord-1, YCoord ].SendMessage("Mark", 4);
+        gemHolder_scr.gems[XCoord, YCoord + 1].SendMessage("Mark",20+i);
+        gemHolder_scr.gems[XCoord, YCoord - 1].SendMessage("Mark", 20 + i);
+        gemHolder_scr.gems[XCoord+1, YCoord ].SendMessage("Mark", 20 + i);
+        gemHolder_scr.gems[XCoord-1, YCoord ].SendMessage("Mark", 20 + i);
 
+        //FullFill Order
+        order_ff = i;
         //Then call GemHolder DestroyedMarked
         //gemHolder_scr.DestroyMarkedTile(false);
 
         return true;
+    }
+
+    private int GetFreshnessScore()
+    {
+        int sum = 0;
+        sum += GetFresh(gemHolder_scr.gems[XCoord, YCoord + 1]);
+        sum += GetFresh(gemHolder_scr.gems[XCoord, YCoord - 1]);
+        sum += GetFresh(gemHolder_scr.gems[XCoord + 1, YCoord ]);
+        sum += GetFresh(gemHolder_scr.gems[XCoord - 1, YCoord]);
+        return sum;
+    }
+
+    private int GetFresh(GameObject g)
+    {
+        int s = 0;
+        s = (int)g.GetComponent<Gem>().status;
+        return s;
+    }
+
+    private void FullFillOrder()
+    {
+        if (order_ff == -1)
+            return;
+        if (count == 2)
+        {
+            
+            //Generate new Order
+            orders[order_ff] = GenerateOrder();
+            order_obj[order_ff].SendMessage("SetScore", score);
+            order_obj[order_ff].SendMessage("SetOrder", orders[order_ff]);
+            gemHolder_scr.AddMoney(score);
+        }
+        else
+        {
+            count++;
+        }
     }
 
     private int GetPositionScore(string[] t, int i)
@@ -258,7 +334,7 @@ public class Character : MonoBehaviour {
                 sum++;
             }
         }
-        return sum;
+        return 5*sum;
     }
 
     //Convert a system of tag into broken down ingredient needed

@@ -8,6 +8,16 @@ public class Order_obj : MonoBehaviour {
     /// Display order: up down right left
     /// </summary>
     public Sprite[] s = new Sprite[5];
+    private GameObject hud;
+    private HUDText hud_text;
+
+    void Start()
+    {
+        hud = GameObject.FindGameObjectWithTag("HUD");
+        Debug.Log(hud);
+        hud_text = hud.GetComponent<HUDText>();
+    }
+
     public void SetOrder(Order order)
     {
         for(int i =0; i < 4; i++)
@@ -16,5 +26,11 @@ public class Order_obj : MonoBehaviour {
                 transform.GetChild(i).GetComponent<SpriteRenderer>().sprite = s[order.ingredient[i]];
             
         }
+    }
+
+    public void SetScore(int score)
+    {
+        hud.SendMessage("FollowTarget", transform);
+        hud_text.Add(score, Color.yellow, 5);
     }
 }

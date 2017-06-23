@@ -12,11 +12,13 @@ public class Gem : MonoBehaviour {
 	bool ready = false;
 	bool detonate = false;
 	bool battleMarked = false;
+    bool cookedMarked = false;
 	public GameObject timer;
 	public GameObject damager;
 	public bool heart =false;
 	public bool isTotem;
 	public int totemLives=3;
+    private Vector3 dest = new Vector3(0, 0, 0);
 
 	//if gems is a character
 	public bool isChar;
@@ -24,6 +26,7 @@ public class Gem : MonoBehaviour {
 	public bool unready;
 	bool match = false;
 	public int damage = 0;
+    private SpriteRenderer BG;
 
 
 	//Set up for click and drag
@@ -45,8 +48,8 @@ public class Gem : MonoBehaviour {
 	private GemHolder gemHolder_scr;
 
     //The Status of the gems(food)
-    public enum Status { Fresh, Good, Okay, Bad, Rat };
-    private Status status;
+    public enum Status { Fresh = 5, Good = 3, Okay = 2, Bad = 1, Rat = 0 };
+    public Status status;
 
     //Currently Coordinate, get by its local position
     public int XCoord
@@ -92,6 +95,8 @@ public class Gem : MonoBehaviour {
 
     private void ChangeStatus()
     {
+        if (isChar)
+            return;
         if (status == Status.Fresh)
         {
             status = Status.Good;
@@ -107,7 +112,9 @@ public class Gem : MonoBehaviour {
         else if (status == Status.Bad)
         {
             status = Status.Rat;
+            gemHolder_scr.rat_flag = true;
         }
+        Debug.Log(status);
         ChangeStatusSprite();
     }
 
@@ -115,28 +122,32 @@ public class Gem : MonoBehaviour {
     {
         if (status == Status.Fresh)
         {
-            
+            BG.color = Color.white;
         }
         if (status == Status.Good)
         {
-
+            BG.color = Color.green;
         }
         if (status == Status.Okay)
         {
-
+            BG.color = Color.yellow;
         }
         if (status == Status.Bad)
         {
-
+            BG.color = Color.magenta;
         }
         if (status == Status.Rat)
         {
-
+            BG.color = Color.red;
         }
     } 
 
 	void Start () 
 	{
+        if (!isChar)
+        {
+            BG = transform.GetChild(0).gameObject.GetComponent<SpriteRenderer>();
+        }
 		timer = GameObject.FindGameObjectWithTag("Timer");
 		hpSlider = timer.GetComponent<UISlider>();
 			transform.localScale = new Vector3(0.9f,0.9f,0.9f);
@@ -168,19 +179,33 @@ public class Gem : MonoBehaviour {
 	void Update () {
 		if(match)
 		{
-			transform.position = Vector3.MoveTowards(transform.position, new Vector3(0,0,0), 10*Time.deltaTime);
-			if(Vector3.Distance(transform.position, new Vector3(0,0,0)) < 0.1f)
-		    {
-				match = false;
-				gemHolder_scr.GemSignal();
-				Destroy(gameObject);
-			}
+            if (cookedMarked)
+            {
+                transform.position = Vector3.MoveTowards(transform.position, dest, 10 * Time.deltaTime);
+                if (Vector3.Distance(transform.position, dest) < 0.1f)
+                {
+                    match = false;
+                    gemHolder_scr.GemSignal();
+                    GameObject.FindGameObjectWithTag("Char").SendMessage("FullFillOrder");
+                    Destroy(gameObject);
+                }
+            }
+            else
+            {
+                transform.position = Vector3.MoveTowards(transform.position, dest, 10 * Time.deltaTime);
+                if (Vector3.Distance(transform.position, dest) < 0.1f)
+                {
+                    match = false;
+                    gemHolder_scr.GemSignal();
+                    Destroy(gameObject);
+                }
+            }
 		}
 	}
 
 	public void CreateGem()
 	{
-		int color = Random.Range (0, 5);
+		//int color = Random.Range (0, gemHolder_scr.max_element);
 		if (isChar) {
 			//transform.tag = "Char";
 		} else {
@@ -191,6 +216,7 @@ public class Gem : MonoBehaviour {
 		curY = YCoord;
 		if(transform.tag == "Heart")
 			heart =true;
+        status = Status.Fresh;
 	}
 
 	/// <summary>
@@ -199,7 +225,7 @@ public class Gem : MonoBehaviour {
 	void Init_color()
 	{
 		//transform.tag = "Unready";
-		int color_num = 5;
+		int color_num = gemHolder_scr.max_element;
 		color = Random.Range(0, color_num);
 		if (color == 0)
 		{
@@ -329,6 +355,7 @@ public class Gem : MonoBehaviour {
 	/// <summary>
 	/// Mark the specified value.
 	/// if mark is 1 that's meant battle marked.
+    /// if mark is 20, that's meant cook marked
 	/// </summary>
 	/// <param name="value">the length of the match, e.g. match 3 or 4</param>
 	void Mark(int val)
@@ -338,6 +365,11 @@ public class Gem : MonoBehaviour {
 		{
 			battleMarked = true;
 		}
+        if(val > 19)
+        {
+            cookedMarked = true;
+            dest = new Vector3(5 + 4 * (val - 20), 13, 0);
+        }
 		marked = true;
 		value = val;
 	}
@@ -346,6 +378,14 @@ public class Gem : MonoBehaviour {
 	{
 		return marked;
 	}
+
+    public void DestroyBad()
+    {
+        if(status == Status.Rat)
+        {
+            MatchAnimation(2);
+        }
+    }
 
 	public void DestroyMarked()
 	{
@@ -394,6 +434,7 @@ public class Gem : MonoBehaviour {
 	/// <param name="type">Type.</param>
 	void MatchAnimation(int dam)
 	{
+        gemHolder_scr.gems[XCoord, YCoord] = null;
 		detonate = true;
 		/*if(transform.CompareTag("Dark") || transform.CompareTag ("Mine"))
 		{
@@ -415,9 +456,11 @@ public class Gem : MonoBehaviour {
 		}
 		else if(dam == 2)
 		{
-		
+		    
 			//Just burn
 			Invoke("DoDestroy",1);
+
+            gemHolder_scr.AddMoney(-gemHolder_scr.cost);
 		}
 		//yield return new WaitForSeconds (1f);
 		//gemHolder_scr.CreateNewGem(XCoord, YCoord);

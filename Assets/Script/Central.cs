@@ -51,8 +51,9 @@ public class Central : MonoBehaviour {
 
 	public void Play()
 	{
-		Instantiate(GemHolder, new Vector3(0,0,0), Quaternion.identity);
-
+		GameObject g = Instantiate(GemHolder, new Vector3(0,0,0), Quaternion.identity);
+        GemHolder g_s = g.GetComponent<GemHolder>();
+        g_s.CustomStart(4, 4, 2);
 	}
 
 	public void Ready()

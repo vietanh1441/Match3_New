@@ -8,17 +8,20 @@ public class GemHolder : MonoBehaviour {
 	public List<Vector2> monsterPos = new List<Vector2>();
 	public int GridWidth = 5;
 	public int GridHeight = 5;
+    public int max_element = 5;
 	public GameObject gemPrefab;
 	public GameObject unreadyGemPrefab;
 	public GameObject[] charPrefab;
 	public List<GameObject> monsterPrefab = new List<GameObject>();
 	public GameObject floorPrefab;
 	bool match_flag = false;
+    public bool rat_flag = false;
 	private int turnCount=0;
 	private int ult_turn, cap_turn;
 	private bool gem_ready = true;
 	public bool ult_active = false;
 	public bool cap_active = false;
+    public int cost;
 	//public int hp = 10;
 	public List<GameObject> darkMagicList = new List<GameObject>();
 	//public GameObject[] monsterPrefab;
@@ -33,10 +36,10 @@ public class GemHolder : MonoBehaviour {
 	public Status status;
 
 	//general ultimate/capture/hp
-	public int hp = 10, maxhp=10, ult = 0, maxUlt = 100, cap= 0, maxCap=100;
+	public int hp = 10, maxhp=10, ult = 0, maxUlt = 100, cap= 0, maxCap=100, money = 0;
 	public GameObject PowerBar, HpBar, HoTBar;
 	UISlider PowerSlider, HpSlider, HoTSlider;
-	UILabel PowerLabel, HpLabel, HoTLabel;
+	UILabel PowerLabel, HpLabel, HoTLabel, MoneyLabel;
 
 	//central
 	private GameObject central;
@@ -48,57 +51,78 @@ public class GemHolder : MonoBehaviour {
 
 	void Start () 
 	{
-
-		hp = maxhp;
-		InitUI();
-		status = Status.Ready;
-		//currentStatus = (int)Status.NewTurn;
-
-		for(int y=5;y<GridHeight+5;y++)
-		{
-			for(int x=5;x<GridWidth+5;x++)
-			{
-				CreateNewGem(x,y);
-				CreateNewFloor(x,y);
-			//	mark_to_create[x,y] = false;
-//				gems.Add(g.GetComponent<Gem>());
-			}
-		}
-		//caching central
-		central = GameObject.Find("Central");
-		central_scr = central.GetComponent<Central>();
-
-		PutInCharacter ();
-		PutInMonster();
-		Display();
-
-		central_scr.Ready();
-	//	PutInMonster ();
+      
 	}
 
-	void InitUI()
+    public void CustomStart(int g, int h, int e)
+    {
+        GridHeight = h;
+        GridWidth = g;
+        max_element = e;
+
+        cost = 10;
+        hp = maxhp;
+        InitUI();
+        status = Status.Ready;
+        //currentStatus = (int)Status.NewTurn;
+
+        for (int y = 5; y < GridHeight + 5; y++)
+        {
+            for (int x = 5; x < GridWidth + 5; x++)
+            {
+                CreateNewGem(x, y);
+                CreateNewFloor(x, y);
+                //	mark_to_create[x,y] = false;
+                //				gems.Add(g.GetComponent<Gem>());
+            }
+        }
+        //caching central
+        central = GameObject.Find("Central");
+        central_scr = central.GetComponent<Central>();
+
+        PutInCharacter();
+        //	PutInMonster();
+        Display();
+
+        central_scr.Ready();
+        //	PutInMonster ();
+    }
+
+    void InitUI()
 	{
 		PowerBar = GameObject.FindGameObjectWithTag ("Power");
-		HpBar= GameObject.FindGameObjectWithTag("HP");
+		//HpBar= GameObject.FindGameObjectWithTag("HP");
 		HoTBar = GameObject.FindGameObjectWithTag("HoT");
 		PowerSlider = PowerBar.GetComponent<UISlider>();
-		HpSlider = HpBar.GetComponent<UISlider>();
+		//HpSlider = HpBar.GetComponent<UISlider>();
 		HoTSlider = HoTBar.GetComponent<UISlider>();
 		PowerLabel = PowerBar.transform.FindChild("Label").gameObject.GetComponent<UILabel>();
-		HpLabel = HpBar.transform.FindChild("Label").gameObject.GetComponent<UILabel>();
+		//HpLabel = HpBar.transform.FindChild("Label").gameObject.GetComponent<UILabel>();
 		HoTLabel = HoTBar.transform.FindChild("Label").gameObject.GetComponent<UILabel>();
+        MoneyLabel = GameObject.FindGameObjectWithTag("Money").GetComponent<UILabel>();
 		Display();
 	}
 
 	public void Display()
 	{
 		PowerSlider.value = (float)ult/maxUlt;
-		HpSlider.value = (float)hp/maxhp;
+		//HpSlider.value = (float)hp/maxhp;
 		HoTSlider.value = (float)cap/maxCap;
 		PowerLabel.text = ult + "/" + maxUlt;
-		HpLabel.text = hp + "/" + maxhp;
+		//HpLabel.text = hp + "/" + maxhp;
 		HoTLabel.text = cap + "/" + maxCap;
+        MoneyLabel.text = "$ " + money;
 	}
+
+    private void DisplayMoney()
+    {
+        MoneyLabel.text = "$ " + money;
+    }
+    public void AddMoney(int m)
+    {
+        money += m;
+        DisplayMoney();
+    }
 
 	public void PutInMonster()
 	{
@@ -229,7 +253,7 @@ public class GemHolder : MonoBehaviour {
 		if(gem_ready == false)
 		{
 			gem_ready = true;
-            Invoke("NextAction", 0.3f);
+            Invoke("NextAction", 0.1f);
 		}
 	}
 
@@ -379,6 +403,20 @@ public class GemHolder : MonoBehaviour {
 		//Invoke ("NextAction", 2);
 	}
 
+    public void DestroyRatTile()
+    {
+        for (int y = 5; y < GridHeight + 5; y++)
+        {
+            for (int x = 5; x < GridWidth + 5; x++)
+            {
+                if (gems[x, y] != null)
+                {
+                    gems[x, y].SendMessage("DestroyBad");
+                }
+            }
+        }
+    }
+
 	public void DestroyMarkedTile(bool t)
 	{
 		for(int y=5;y<GridHeight+5;y++)
@@ -412,16 +450,23 @@ public class GemHolder : MonoBehaviour {
 	/// 
 	public void CheckMonster()
 	{
+        if (!rat_flag)
+            NextAction();
+        else
+        {
+            gem_ready = false;
+            /*for(int y=5;y<GridHeight+5;y++)
+            {
+                for(int x=5;x<GridWidth+5;x++)
+                { 
+                    if(floors[x,y] !=null)
+                    floors[x,y].SendMessage("ChangeColor", Color.white);
+                }
+            }*/
 
-		for(int y=5;y<GridHeight+5;y++)
-		{
-			for(int x=5;x<GridWidth+5;x++)
-			{ 
-				if(floors[x,y] !=null)
-				floors[x,y].SendMessage("ChangeColor", Color.white);
-			}
-		}
-
+            DestroyRatTile();
+        }
+        /*
 		Debug.Log ("CheckMonster");
 		charfinish = 0;
 		//Do Character stuff
@@ -435,7 +480,7 @@ public class GemHolder : MonoBehaviour {
 			{
 				monster.SendMessage("DoAction");
 			}
-		}
+		}*/
 	//	Invoke ("NextAction", 1);
 	}
 
@@ -460,11 +505,12 @@ public class GemHolder : MonoBehaviour {
 				if(gems[x,y] == null)
 				{
 					CreateUnreadyGem(x,y);
+                    
 				}
-                else
+               /* else
                 {
-                    Debug.Log(gems[x, y].tag +" " + x + " " +y);
-                }
+                    //Debug.Log(gems[x, y].tag +" " + x + " " +y);
+                }*/
 			}
 		}
         Invoke("NextAction", 0.3f);
