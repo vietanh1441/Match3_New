@@ -15,6 +15,7 @@ public class GemHolder : MonoBehaviour {
 	public List<GameObject> monsterPrefab = new List<GameObject>();
 	public GameObject floorPrefab;
 	bool match_flag = false;
+    public bool no_bad = true;
     public bool rat_flag = false;
 	private int turnCount=0;
 	private int ult_turn, cap_turn;
@@ -253,7 +254,7 @@ public class GemHolder : MonoBehaviour {
 		if(gem_ready == false)
 		{
 			gem_ready = true;
-            Invoke("NextAction", 0.1f);
+            Invoke("NextAction", 0.3f);
 		}
 	}
 
@@ -291,6 +292,7 @@ public class GemHolder : MonoBehaviour {
 			status = Status.Ready;
 			//Ready ();
 		}
+        Debug.Log(status);
 	}
 
 	public void CheckGameStatus()
@@ -405,15 +407,22 @@ public class GemHolder : MonoBehaviour {
 
     public void DestroyRatTile()
     {
+        no_bad = true;
         for (int y = 5; y < GridHeight + 5; y++)
         {
             for (int x = 5; x < GridWidth + 5; x++)
             {
                 if (gems[x, y] != null)
                 {
+                    
                     gems[x, y].SendMessage("DestroyBad");
                 }
             }
+        }
+        if(no_bad)
+        {
+            NextAction();
+            rat_flag = false;
         }
     }
 

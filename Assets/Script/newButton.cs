@@ -27,13 +27,34 @@ public class newButton : MonoBehaviour {
 	
 	void OnMouseDown()
 	{
+        Debug.Log(hit);
 		Invoke(hit, 0.1f);
 	}
 
-	void Play()
+	/*void Play()
 	{
 		central_scr.Play();
-	}
+	}*/
+
+    void VeryEasy()
+    {
+        central_scr.Play(4, 3);
+    }
+
+    void Easy()
+    {
+        central_scr.Play(5, 4);
+    }
+
+    void Normal()
+    {
+        central_scr.Play(5, 5);
+    }
+
+    void Hard()
+    {
+        central_scr.Play(6, 5);
+    }
 
 	void UnPause()
 	{
@@ -59,4 +80,9 @@ public class newButton : MonoBehaviour {
 	{
 		//nothing for now
 	}
+
+    void StageSelect()
+    {
+        central_scr.StageSelect();
+    }
 }

@@ -49,12 +49,18 @@ public class Central : MonoBehaviour {
 		}
 	}
 
-	public void Play()
+	public void Play(int x, int y)
 	{
 		GameObject g = Instantiate(GemHolder, new Vector3(0,0,0), Quaternion.identity);
         GemHolder g_s = g.GetComponent<GemHolder>();
-        g_s.CustomStart(4, 4, 2);
+        g_s.CustomStart(x, x, y);
 	}
+
+    public void StageSelect()
+    {
+        playScreen = GameObject.Find("PlayScreen");
+        playScreen.SendMessage("StageSelect");
+    }
 
 	public void Ready()
 	{

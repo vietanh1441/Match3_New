@@ -383,6 +383,7 @@ public class Gem : MonoBehaviour {
     {
         if(status == Status.Rat)
         {
+            gemHolder_scr.no_bad = false;
             MatchAnimation(2);
         }
     }
