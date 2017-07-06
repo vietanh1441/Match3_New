@@ -229,6 +229,7 @@
     <Compile Include="Assets\NGUI\Scripts\UI\UITexture.cs" />
     <Compile Include="Assets\NGUI\Scripts\UI\UITooltip.cs" />
     <Compile Include="Assets\NGUI\Scripts\UI\UIViewport.cs" />
+    <Compile Include="Assets\OrderList.cs" />
     <Compile Include="Assets\Order_obj.cs" />
     <Compile Include="Assets\Room.cs" />
     <Compile Include="Assets\Script\Central.cs" />

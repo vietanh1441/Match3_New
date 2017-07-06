@@ -37,6 +37,7 @@ public class Character : MonoBehaviour {
 	/// </summary>
 	public int type;
 	public SkillSet skillSet;
+    private OrderList orderList;
 
 	//list of available skill and list of level of skill
 
@@ -80,8 +81,8 @@ public class Character : MonoBehaviour {
     void Start () {
        // orders = new Order[1] { o };
 		Sync();
-		//Get info from central
-
+        //Get info from central
+        orderList = GameObject.FindGameObjectWithTag("OrderList").GetComponent<OrderList>();
 		skillSet = GameObject.Find("SkillSet").GetComponent<SkillSet>();
 		hp = max_hp;
 		InitUI();
@@ -313,7 +314,7 @@ public class Character : MonoBehaviour {
         {
             
             //Generate new Order
-            orders[order_ff] = GenerateOrder();
+           // orders[order_ff] = GenerateOrder();
             order_obj[order_ff].SendMessage("SetScore", score);
             order_obj[order_ff].SendMessage("SetOrder", orders[order_ff]);
             gemHolder_scr.AddMoney(score);

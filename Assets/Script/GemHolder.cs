@@ -46,6 +46,9 @@ public class GemHolder : MonoBehaviour {
 	private GameObject central;
 	private Central central_scr;
 
+    //to count gem
+    int gem_count;
+
 	//public int currentStatus;
 
     
@@ -55,13 +58,14 @@ public class GemHolder : MonoBehaviour {
       
 	}
 
-    public void CustomStart(int g, int h, int e)
+    public void CustomStart(int g, int h, int e, int char_hp)
     {
         GridHeight = h;
         GridWidth = g;
         max_element = e;
 
         cost = 10;
+        maxhp = char_hp;
         hp = maxhp;
         InitUI();
         status = Status.Ready;
@@ -92,13 +96,13 @@ public class GemHolder : MonoBehaviour {
     void InitUI()
 	{
 		PowerBar = GameObject.FindGameObjectWithTag ("Power");
-		//HpBar= GameObject.FindGameObjectWithTag("HP");
+		HpBar= GameObject.FindGameObjectWithTag("HP");
 		HoTBar = GameObject.FindGameObjectWithTag("HoT");
 		PowerSlider = PowerBar.GetComponent<UISlider>();
-		//HpSlider = HpBar.GetComponent<UISlider>();
+		HpSlider = HpBar.GetComponent<UISlider>();
 		HoTSlider = HoTBar.GetComponent<UISlider>();
 		PowerLabel = PowerBar.transform.FindChild("Label").gameObject.GetComponent<UILabel>();
-		//HpLabel = HpBar.transform.FindChild("Label").gameObject.GetComponent<UILabel>();
+		HpLabel = HpBar.transform.FindChild("Label").gameObject.GetComponent<UILabel>();
 		HoTLabel = HoTBar.transform.FindChild("Label").gameObject.GetComponent<UILabel>();
         MoneyLabel = GameObject.FindGameObjectWithTag("Money").GetComponent<UILabel>();
 		Display();
@@ -107,10 +111,10 @@ public class GemHolder : MonoBehaviour {
 	public void Display()
 	{
 		PowerSlider.value = (float)ult/maxUlt;
-		//HpSlider.value = (float)hp/maxhp;
+		HpSlider.value = (float)hp/maxhp;
 		HoTSlider.value = (float)cap/maxCap;
 		PowerLabel.text = ult + "/" + maxUlt;
-		//HpLabel.text = hp + "/" + maxhp;
+		HpLabel.text = hp + "/" + maxhp;
 		HoTLabel.text = cap + "/" + maxCap;
         MoneyLabel.text = "$ " + money;
 	}
@@ -251,12 +255,23 @@ public class GemHolder : MonoBehaviour {
 
 	public void GemSignal()
 	{
+        Debug.Log("GemSignal");
 		if(gem_ready == false)
 		{
 			gem_ready = true;
-            Invoke("NextAction", 0.3f);
+            Invoke("NextAction", 1f);
 		}
 	}
+
+    public void GemAdd(int i)
+    {
+        gem_count += i;
+        if(gem_count < 1)
+        {
+            gem_count = 100;
+            Invoke("NextAction", 0.3f);
+        }
+    }
 
 	//The game "clock", dictacte what to do next;
 	public void NextAction()
@@ -343,6 +358,7 @@ public class GemHolder : MonoBehaviour {
 	public void CheckChar()
 	{
 		Debug.Log ("CheckChar");
+        gem_count = 0;
 		charfinish = 0;
 		//Do Character stuff
 		foreach(GameObject character in characterList)
@@ -378,6 +394,7 @@ public class GemHolder : MonoBehaviour {
 	{
 		gem_ready = false; 
 		match_flag = false;
+        gem_count = 0;
 		Debug.Log ("CheckBoard");
 		//Check whole board for match, if it's indeed match, mark them
 		for(int y=5;y<GridHeight+5;y++)

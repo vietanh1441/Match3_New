@@ -20,6 +20,8 @@ public class Order  {
         }
     }
 
+    //initialize order
+    //j is the list of ingredient for the order
     public Order(int[] j)
     {
         for (int i = 0; i < 4; i++)

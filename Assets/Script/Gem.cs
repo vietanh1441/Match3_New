@@ -87,15 +87,15 @@ public class Gem : MonoBehaviour {
 				Destroy(gameObject);
 			}
 		}
-        else
+        /*else
         {
             ChangeStatus();
-        }
+        }*/
 	}
 
     private void ChangeStatus()
     {
-        if (isChar)
+       /* if (transform.tag != "ItemE")
             return;
         if (status == Status.Fresh)
         {
@@ -115,7 +115,7 @@ public class Gem : MonoBehaviour {
             gemHolder_scr.rat_flag = true;
         }
         Debug.Log(status);
-        ChangeStatusSprite();
+        ChangeStatusSprite();*/
     }
 
     private void ChangeStatusSprite()
@@ -170,7 +170,7 @@ public class Gem : MonoBehaviour {
 		{
 			transform.tag = "Unready";
 		}
-
+        damage = 1;
 	}
 
 
@@ -185,7 +185,8 @@ public class Gem : MonoBehaviour {
                 if (Vector3.Distance(transform.position, dest) < 0.1f)
                 {
                     match = false;
-                    gemHolder_scr.GemSignal();
+                    //gemHolder_scr.GemSignal();
+                    gemHolder_scr.GemAdd(-1);
                     GameObject.FindGameObjectWithTag("Char").SendMessage("FullFillOrder");
                     Destroy(gameObject);
                 }
@@ -196,7 +197,8 @@ public class Gem : MonoBehaviour {
                 if (Vector3.Distance(transform.position, dest) < 0.1f)
                 {
                     match = false;
-                    gemHolder_scr.GemSignal();
+                    //gemHolder_scr.GemSignal();
+                    gemHolder_scr.GemAdd(-1);
                     Destroy(gameObject);
                 }
             }
@@ -277,7 +279,7 @@ public class Gem : MonoBehaviour {
 	void OnMouseDrag()
 	{
 		//Debug.Log ((int)gemHolder_scr.status);
-		if (isChar || unready)
+		if (unready)
 			return;
 		if (release == false &&(int)gemHolder_scr.status == 0 ) {
 			hpSlider.value = hpSlider.value-Time.deltaTime/5; 
@@ -390,9 +392,12 @@ public class Gem : MonoBehaviour {
 
 	public void DestroyMarked()
 	{
-		//Error checking make sure that the character does not get killed in matching
-		if (isChar&&unready)
-			return;
+        //Error checking make sure that the character does not get killed in matching
+        if (isChar && unready)
+        {
+
+            return;
+        }
 
 		if (marked) {
 			/*if(t)
@@ -419,7 +424,7 @@ public class Gem : MonoBehaviour {
 			}
 			else
 			{
-                Debug.Log("MatchHere");
+                //Debug.Log("MatchHere");
 				MatchAnimation(0);
 			}
 
@@ -428,26 +433,40 @@ public class Gem : MonoBehaviour {
 
 	/// <summary>
 	/// Make animations as the gems get destroyed. Based on type, do different animation
-	/// 0: just go to wherever;
+	/// 0: normal match, just go to wherever;
 	/// 1: break animation
 	/// 2: Attack animation
 	/// </summary>
 	/// <param name="type">Type.</param>
 	void MatchAnimation(int dam)
 	{
+        gemHolder_scr.GemAdd(1);
         gemHolder_scr.gems[XCoord, YCoord] = null;
 		detonate = true;
-		/*if(transform.CompareTag("Dark") || transform.CompareTag ("Mine"))
+		if(transform.CompareTag("ItemD") )
 		{
 			DealDamage(XCoord,YCoord+1);
 			DealDamage(XCoord,YCoord-1);
 			DealDamage(XCoord+1,YCoord);
 			DealDamage(XCoord-1,YCoord);
 
-		}*/
+		}
 		transform.localScale = new Vector3(0.5f,0.5f,0.5f);
 		if(dam== 0)
 		{
+            //TODO add gem specific modification of the board state
+
+            //Attack gem (ItemA) Increase total amount of damage deal to monster in this turn
+
+            //Defense gem increase total amount of defense this turn
+
+            //Ice deal ice damage, increase ice-fire bar to ice side
+
+            //fire deal fire damage, increase ice-fire bar to fire side
+
+            //money add money 
+
+            //match
 			match = true;
 		}
 		else if(dam == 1)
@@ -470,7 +489,8 @@ public class Gem : MonoBehaviour {
 
 	void DoDestroy()
 	{
-		gemHolder_scr.GemSignal();
+        //gemHolder_scr.GemSignal();
+        gemHolder_scr.GemAdd(-1);
 		Destroy(gameObject);
 	}
 
@@ -495,11 +515,8 @@ public class Gem : MonoBehaviour {
 	void DealDamage(int x,int y)
 	{
 		GameObject d = Instantiate(damager, new Vector3( x, y, transform.position.z), Quaternion.identity) as GameObject;
-		if(transform.CompareTag("Dark"))
-		{
-		d.SendMessage("SetDamage",1);
-		}
-		if(transform.CompareTag("Mine"))
+		
+		if(transform.CompareTag("ItemD"))
 		{
 			//Debug.Log ("Hmm");
 			d.SendMessage("SetDamage", damage);

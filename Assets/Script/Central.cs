@@ -53,7 +53,7 @@ public class Central : MonoBehaviour {
 	{
 		GameObject g = Instantiate(GemHolder, new Vector3(0,0,0), Quaternion.identity);
         GemHolder g_s = g.GetComponent<GemHolder>();
-        g_s.CustomStart(x, x, y);
+        g_s.CustomStart(x, x, y, 5);
 	}
 
     public void StageSelect()

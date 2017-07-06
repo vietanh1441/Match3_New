@@ -14,7 +14,7 @@ public class Order_obj : MonoBehaviour {
     void Start()
     {
         hud = GameObject.FindGameObjectWithTag("HUD");
-        Debug.Log(hud);
+        //Debug.Log(hud);
         hud_text = hud.GetComponent<HUDText>();
     }
 
