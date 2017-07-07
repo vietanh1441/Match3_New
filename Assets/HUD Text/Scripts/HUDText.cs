@@ -410,4 +410,8 @@ public class HUDText : MonoBehaviour
 			offset += Mathf.Round(ent.label.cachedTransform.localScale.y * ent.label.fontSize);
 		}
 	}
+
+    
 }
+
+

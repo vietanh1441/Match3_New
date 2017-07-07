@@ -41,7 +41,7 @@ public class Monster : MonoBehaviour {
 		gemHolder_obj = GameObject.FindGameObjectWithTag ("GemHolder");
 		gemHolder_scr = gemHolder_obj.GetComponent<GemHolder> ();
 		transform.parent = gemHolder_obj.transform;
-		//gemHolder_scr.monsterList.Add (gameObject);
+		gemHolder_scr.monsterList.Add (gameObject);
 		hd.Add("testing", Color.white, 2);
 	}
 	
@@ -79,44 +79,49 @@ public class Monster : MonoBehaviour {
 
 	void Attacking()
 	{
-		/*Vector2 pos;
-	
-		for(int i = 0; i < hitPos.Length; i++)
-		{
-			if(hitPos[i]!=null)
-				pos = hitPos[i];
+		Vector2 pos;
 
-			if(up)
-				HitTile(pos);
-			if(down)
-				HitTile(Downize(pos));
-			if(right)
-				HitTile(Rightize(pos));
-			if(left)
-				HitTile(Leftize(pos));
+        for (int i = 0; i < hitPos.Length; i++)
+        {
+            
+            if (hitPos[i] != null)
+            {
+                pos = hitPos[i];
+
+            if (up)
+                HitTile(pos);
+            if (down)
+                HitTile(Downize(pos));
+            if (right)
+                HitTile(Rightize(pos));
+            if (left)
+                HitTile(Leftize(pos));
+        }
 		}
-		//HitTile (1,0);*/
+		//HitTile (1,0);
 	}
 
 	void Warning()
 	{
-		/*Vector2 pos;
+		Vector2 pos;
 		
 		for(int i = 0; i < hitPos.Length; i++)
 		{
-			if(hitPos[i]!=null)
-				pos = hitPos[i];
-			
-			if(up)
-				WarnTile(pos);
-			if(down)
-				WarnTile(Downize(pos));
-			if(right)
-				WarnTile(Rightize(pos));
-			if(left)
-				WarnTile(Leftize(pos));
+            if (hitPos[i] != null)
+            {
+                pos = hitPos[i];
+
+                if (up)
+                    WarnTile(pos);
+                if (down)
+                    WarnTile(Downize(pos));
+                if (right)
+                    WarnTile(Rightize(pos));
+                if (left)
+                    WarnTile(Leftize(pos));
+            }
 		}
-		//HitTile (1,0);*/
+		//HitTile (1,0);
 	}
 
 	static Vector2 Downize(Vector2 pos)

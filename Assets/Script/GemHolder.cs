@@ -86,7 +86,7 @@ public class GemHolder : MonoBehaviour {
         central_scr = central.GetComponent<Central>();
 
         PutInCharacter();
-        //	PutInMonster();
+        PutInMonster();
         Display();
 
         central_scr.Ready();
@@ -476,7 +476,23 @@ public class GemHolder : MonoBehaviour {
 	/// 
 	public void CheckMonster()
 	{
-        if (!rat_flag)
+
+        Debug.Log("CheckMonster");
+        charfinish = 0;
+        //Do Character stuff
+        if (monsterList.Count == 0)
+        {
+            Invoke("NextAction", 0.3f);
+        }
+        else
+        {
+            foreach (GameObject monster in monsterList)
+            {
+                monster.SendMessage("DoAction");
+            }
+        }
+
+       /* if (!rat_flag)
             NextAction();
         else
         {
@@ -488,25 +504,11 @@ public class GemHolder : MonoBehaviour {
                     if(floors[x,y] !=null)
                     floors[x,y].SendMessage("ChangeColor", Color.white);
                 }
-            }*/
+            }
 
             DestroyRatTile();
         }
-        /*
-		Debug.Log ("CheckMonster");
-		charfinish = 0;
-		//Do Character stuff
-		if(monsterList.Count == 0)
-		{
-			Invoke("NextAction", 0.3f);
-		}
-		else
-		{
-			foreach(GameObject monster in monsterList)
-			{
-				monster.SendMessage("DoAction");
-			}
-		}*/
+        */
 	//	Invoke ("NextAction", 1);
 	}
 
